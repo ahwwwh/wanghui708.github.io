@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="非淡泊无以明志，非宁静无以致远">
+<meta name="description" content="Java多线程编程概念 进程：每个进程有自己独立的代码段和数据空间（进程上下文），进程间切换会有较大的开销，每个进程会有1-n个线程，进程是资源分配的最小单位； 线程： 同一类线程共享代码段和数据空间，每个线程有独立的运行栈和程序计数器，线程切换开销小（线程是CPU调度的最小单位） 线程和进程均可分为五阶段：创建、就绪、运行、阻塞、终止 多进程：操作系统可以同时运行多进程（多个任务） 多线程：同一">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java-多线程">
 <meta property="og:url" content="http://yoursite.com/2019/05/27/Java-多线程/index.html">
 <meta property="og:site_name" content="明哲而痴心">
-<meta property="og:description" content="非淡泊无以明志，非宁静无以致远">
+<meta property="og:description" content="Java多线程编程概念 进程：每个进程有自己独立的代码段和数据空间（进程上下文），进程间切换会有较大的开销，每个进程会有1-n个线程，进程是资源分配的最小单位； 线程： 同一类线程共享代码段和数据空间，每个线程有独立的运行栈和程序计数器，线程切换开销小（线程是CPU调度的最小单位） 线程和进程均可分为五阶段：创建、就绪、运行、阻塞、终止 多进程：操作系统可以同时运行多进程（多个任务） 多线程：同一">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-05-27T03:19:39.005Z">
+<meta property="og:updated_time" content="2019-05-27T03:30:40.271Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java-多线程">
-<meta name="twitter:description" content="非淡泊无以明志，非宁静无以致远">
+<meta name="twitter:description" content="Java多线程编程概念 进程：每个进程有自己独立的代码段和数据空间（进程上下文），进程间切换会有较大的开销，每个进程会有1-n个线程，进程是资源分配的最小单位； 线程： 同一类线程共享代码段和数据空间，每个线程有独立的运行栈和程序计数器，线程切换开销小（线程是CPU调度的最小单位） 线程和进程均可分为五阶段：创建、就绪、运行、阻塞、终止 多进程：操作系统可以同时运行多进程（多个任务） 多线程：同一">
 
 
 
@@ -299,7 +299,20 @@
       
 
       
-        
+        <h1 id="Java多线程编程"><a href="#Java多线程编程" class="headerlink" title="Java多线程编程"></a>Java多线程编程</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
+<li>进程：每个进程有自己独立的代码段和数据空间（进程上下文），进程间切换会有较大的开销，每个进程会有1-n个线程，进程是资源分配的最小单位；</li>
+<li>线程： 同一类线程共享代码段和数据空间，每个线程有独立的运行栈和程序计数器，线程切换开销小（线程是CPU调度的最小单位）</li>
+<li>线程和进程均可分为五阶段：创建、就绪、运行、阻塞、终止</li>
+<li>多进程：操作系统可以同时运行多进程（多个任务）</li>
+<li>多线程：同一个程序可以同时有多个顺序流执行</li>
+</ul>
+<p>Java中实现多线程的三种方式：</p>
+<ul>
+<li>继承Thread类；</li>
+<li>实现Runable接口；</li>
+<li>实现Callable接口，并与Future、线程池结合使用</li>
+</ul>
+
       
     </div>
     
@@ -319,22 +332,6 @@
       
       
 
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2018/12/10/Hello/" rel="next" title="Hello">
-                <i class="fa fa-chevron-left"></i> Hello
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-          </div>
-        </div>
       
 
       
@@ -383,8 +380,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -403,7 +409,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">1</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -430,6 +436,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java多线程编程"><span class="nav-number">1.</span> <span class="nav-text">Java多线程编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概念"><span class="nav-number">1.1.</span> <span class="nav-text">概念</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
