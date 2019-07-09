@@ -1,5 +1,5 @@
 ---
-title: Fastdfs+nginx编译部署.md
+title: Fastdfs+nginx编译部署
 date: 2019-07-09 16:12:40
 tags:
 ---
