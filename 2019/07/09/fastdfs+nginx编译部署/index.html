@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <link rel="dns-prefetch" href="http://yoursite.com">
+  <title>Fastdfs+nginx编译部署 | 明哲而痴心</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="系统环境 华为泰山2280服务器 中标麒麟操作系统  安装包下载 libevent-2.1.8-stable.tar.gz libfastcommonV1.0.39 fastdfs5.08 fastdfs-nginx-module_1.20.tar.gz  安装步骤：1. libevent-2.1.8-stable.tar.gz12345tar -zxvf  libevent-2.1.8-stab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fastdfs+nginx编译部署">
+<meta property="og:url" content="http://yoursite.com/2019/07/09/fastdfs+nginx编译部署/index.html">
+<meta property="og:site_name" content="明哲而痴心">
+<meta property="og:description" content="系统环境 华为泰山2280服务器 中标麒麟操作系统  安装包下载 libevent-2.1.8-stable.tar.gz libfastcommonV1.0.39 fastdfs5.08 fastdfs-nginx-module_1.20.tar.gz  安装步骤：1. libevent-2.1.8-stable.tar.gz12345tar -zxvf  libevent-2.1.8-stab">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-07-09T09:52:51.543Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fastdfs+nginx编译部署">
+<meta name="twitter:description" content="系统环境 华为泰山2280服务器 中标麒麟操作系统  安装包下载 libevent-2.1.8-stable.tar.gz libfastcommonV1.0.39 fastdfs5.08 fastdfs-nginx-module_1.20.tar.gz  安装步骤：1. libevent-2.1.8-stable.tar.gz12345tar -zxvf  libevent-2.1.8-stab">
+  
+    <link rel="alternative" href="/atom.xml" title="明哲而痴心" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" type="text/css" href="/./main.0cf68a.css">
+  <style type="text/css">
+  
+    #container.show {
+      background: linear-gradient(200deg,#a0cfe4,#e8c37e);
+    }
+  </style>
+  
+
+  
+
+</head>
+
+<body>
+  <div id="container" q-class="show:isCtnShow">
+    <canvas id="anm-canvas" class="anm-canvas"></canvas>
+    <div class="left-col" q-class="show:isShow">
+      
+<div class="overlay" style="background: #4d4d4d"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="" class="js-avatar">
+		</a>
+		<hgroup>
+		  <h1 class="header-author"><a href="/">记得</a></h1>
+		</hgroup>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/tags/随笔/">随笔</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+    		
+    			
+    			<a q-on="click: openSlider(e, 'innerArchive')" href="javascript:void(0)">所有文章</a>
+    			
+            
+    			
+    			<a q-on="click: openSlider(e, 'friends')" href="javascript:void(0)">友链</a>
+    			
+            
+    			
+    			<a q-on="click: openSlider(e, 'aboutme')" href="javascript:void(0)">关于我</a>
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="#" title="github"><i class="icon-github"></i></a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo"><i class="icon-weibo"></i></a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss"><i class="icon-rss"></i></a>
+		        
+					<a class="zhihu" target="_blank" href="#" title="zhihu"><i class="icon-zhihu"></i></a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col" q-class="show:isShow,hide:isShow|isFalse">
+      
+<nav id="mobile-nav">
+  	<div class="overlay js-overlay" style="background: #4d4d4d"></div>
+	<div class="btnctn js-mobile-btnctn">
+  		<div class="slider-trigger list" q-on="click: openSlider(e)"><i class="icon icon-sort"></i></div>
+	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author js-header-author">记得</h1>
+			</hgroup>
+			
+			
+			
+				
+			
+				
+			
+			
+			
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="#" title="github"><i class="icon-github"></i></a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo"><i class="icon-weibo"></i></a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss"><i class="icon-rss"></i></a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu"><i class="icon-zhihu"></i></a>
+			        
+				</div>
+			</nav>
+
+			<nav class="header-menu js-header-menu">
+				<ul style="width: 50%">
+				
+				
+					<li style="width: 50%"><a href="/">主页</a></li>
+		        
+					<li style="width: 50%"><a href="/tags/随笔/">随笔</a></li>
+		        
+				</ul>
+			</nav>
+		</header>				
+	</div>
+	<div class="mobile-mask" style="display:none" q-show="isShow"></div>
+</nav>
+
+      <div id="wrapper" class="body-wrap">
+        <div class="menu-l">
+          <div class="canvas-wrap">
+            <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
+          </div>
+          <div id="js-content" class="content-ll">
+            <article id="post-fastdfs+nginx编译部署" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Fastdfs+nginx编译部署
+    </h1>
+  
+
+        
+        <a href="/2019/07/09/fastdfs+nginx编译部署/" class="archive-article-date">
+  	<time datetime="2019-07-09T08:12:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-09</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h2><ul>
+<li>华为泰山2280服务器</li>
+<li>中标麒麟操作系统</li>
+</ul>
+<h2 id="安装包下载"><a href="#安装包下载" class="headerlink" title="安装包下载"></a>安装包下载</h2><ul>
+<li><a href="http://libevent.org/" target="_blank" rel="noopener">libevent-2.1.8-stable.tar.gz</a></li>
+<li><a href="https://github.com/happyfish100/libfastcommon" target="_blank" rel="noopener">libfastcommonV1.0.39</a></li>
+<li><a href="https://github.com/happyfish100/fastdfs" target="_blank" rel="noopener">fastdfs5.08</a></li>
+<li><a href="https://github.com/happyfish100/fastdfs-nginx-module/releases" target="_blank" rel="noopener">fastdfs-nginx-module_1.20.tar.gz</a></li>
+</ul>
+<h2 id="安装步骤："><a href="#安装步骤：" class="headerlink" title="安装步骤："></a>安装步骤：</h2><h3 id="1-libevent-2-1-8-stable-tar-gz"><a href="#1-libevent-2-1-8-stable-tar-gz" class="headerlink" title="1. libevent-2.1.8-stable.tar.gz"></a>1. libevent-2.1.8-stable.tar.gz</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf  libevent-2.1.8-stable.tar.gz</span><br><span class="line">cd libevent-2.1.8-stable</span><br><span class="line">./configure --prefix=/usr  </span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<h3 id="2-libfastcommonV1-0-39"><a href="#2-libfastcommonV1-0-39" class="headerlink" title="2. libfastcommonV1.0.39"></a>2. libfastcommonV1.0.39</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf libfastcommonV1.0.39.tar.gz</span><br><span class="line">cd libfastcommonV1.0.39</span><br><span class="line">./make.sh</span><br><span class="line">./make.sh install</span><br><span class="line">cp /usr/lib64/libfastcommon.so /usr/lib</span><br></pre></td></tr></table></figure>
+<h3 id="3-fastdfs5-12-–-tracker服务"><a href="#3-fastdfs5-12-–-tracker服务" class="headerlink" title="3. fastdfs5.12 – tracker服务"></a>3. fastdfs5.12 – tracker服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 安装Tracker服务</span><br><span class="line">unzip fastdfs-master.zip</span><br><span class="line">cd fastdfs-master</span><br><span class="line">./make.sh</span><br><span class="line">./make.sh install</span><br><span class="line"></span><br><span class="line">#查看安装结果:</span><br><span class="line">ll /usr/bin/fdfs_*  </span><br><span class="line"></span><br><span class="line">#把conf目录下的所有的配置文件都复制到/etc/fdfs下</span><br><span class="line">cp conf/* /etc/fdfs</span><br><span class="line">     </span><br><span class="line">#配置tracker服务</span><br><span class="line">cd /etc/fdfs</span><br><span class="line">vi tracker.conf</span><br><span class="line"></span><br><span class="line">#修改</span><br><span class="line">base_path=/usr/local/fastdfs/tracker</span><br><span class="line">#创建/usr/local/fastdfs/tracker路径</span><br><span class="line">mkidr -p /usr/local/fastdfs/tracker</span><br><span class="line"></span><br><span class="line">#重启使用命令</span><br><span class="line">/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf restart</span><br></pre></td></tr></table></figure>
+<h3 id="4-fastdfs5-08-–-storage服务"><a href="#4-fastdfs5-08-–-storage服务" class="headerlink" title="4. fastdfs5.08 – storage服务"></a>4. fastdfs5.08 – storage服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#设置日志保存路径</span><br><span class="line">base_path=/usr/local/fastdfs/storage</span><br><span class="line">#设置图标文件的保存位置</span><br><span class="line">store_path0=/usr/local/fastdfs/storage</span><br><span class="line">#设置tracker服务</span><br><span class="line">tracker_server=&#123;IP&#125;:22122</span><br><span class="line">#创建该路径</span><br><span class="line">mkdir /usr/local/fastdfs/storage</span><br><span class="line">#启动服务</span><br><span class="line">/usr/bin/fdfs_storaged /etc/fdfs/storage.conf restart</span><br></pre></td></tr></table></figure>
+<h3 id="5-测试"><a href="#5-测试" class="headerlink" title="5. 测试"></a>5. 测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">cd /etc/fdfs</span><br><span class="line">vi client.conf</span><br><span class="line">#设置日志路径</span><br><span class="line">base_path=/usr/local/fastdfs/client</span><br><span class="line">#设置链接服务</span><br><span class="line">tracker_server=&#123;IP&#125;:22122</span><br><span class="line">#创建路径</span><br><span class="line">mkdir /usr/local/fastdfs/client</span><br><span class="line">#开始测试</span><br><span class="line">cd /etc/fdfs</span><br><span class="line">#上传当前anti-steal.jpg图片</span><br><span class="line">/usr/bin/fdfs_test /etc/fdfs/client.conf upload anti-steal.jpg</span><br><span class="line">#结果如下则成功:</span><br><span class="line">  file crc32=2553063749example file url: http://&#123;IP&#125;/group1/M00/00/00/rBIHSVp4F2eAVzatAABdrZgsqUU155.jpg</span><br><span class="line">remote_filename=M00/00/00/rBIHSVp4F2eAVzatAABdrZgsqUU155_big.jpg</span><br><span class="line">example file url: http://&#123;IP&#125;/group1/M00/00/00/rBIHSVp4F2eAVzatAABdrZgsqUU155_big.jpg</span><br></pre></td></tr></table></figure>
+<h3 id="6-安装fastdfs-nginx-module-1-20-tar-gz"><a href="#6-安装fastdfs-nginx-module-1-20-tar-gz" class="headerlink" title="6. 安装fastdfs-nginx-module_1.20.tar.gz"></a>6. 安装fastdfs-nginx-module_1.20.tar.gz</h3><h4 id="首先需要安装nginx-nginx-1-15-1"><a href="#首先需要安装nginx-nginx-1-15-1" class="headerlink" title="首先需要安装nginx  nginx 1.15.1"></a>首先需要安装nginx  <a href="http://nginx.org/download/nginx-1.15.1.tar.gz" target="_blank" rel="noopener">nginx 1.15.1</a></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#下载nginx 1.15.1</span><br><span class="line">tar -zxvf nginx-1.15.1.tar.gz</span><br><span class="line">cd nginx-1.15.1</span><br><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<h4 id="添加nginx为系统服务"><a href="#添加nginx为系统服务" class="headerlink" title="添加nginx为系统服务"></a>添加nginx为系统服务</h4><p>cat /usr/lib/systemd/system/nginx.service</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=nginx</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=forking</span><br><span class="line">PIDFile=/usr/local/nginx/logs/nginx.pid</span><br><span class="line">ExecStartPre=/usr/local/nginx/sbin/nginx -t -q -g &apos;daemon on; master_process on;&apos;</span><br><span class="line">ExecStart=/usr/local/nginx/sbin/nginx -g &apos;daemon on; master_process on;&apos;</span><br><span class="line">ExecReload=/usr/local/nginx/sbin/nginx -g &apos;daemon on; master_process on;&apos; -s reload</span><br><span class="line">ExecStop=-/sbin/start-stop-daemon --quiet --stop --retry QUIT/5 --pidfile /usr/local/nginx/logs/nginx.pid</span><br><span class="line">TimeoutStopSec=5</span><br><span class="line">KillMode=mixed</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+<h4 id="修改fastdfs-nginx-module配置文件"><a href="#修改fastdfs-nginx-module配置文件" class="headerlink" title="修改fastdfs-nginx-module配置文件"></a>修改fastdfs-nginx-module配置文件</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">cd fastdfs-nginx-module_1.20</span><br><span class="line">cd src</span><br><span class="line">vi config</span><br><span class="line"></span><br><span class="line"># 注意删除local,很多头文件在/usr/include目录下，而不是/usr/local/include</span><br><span class="line"># config文件内容如下 </span><br><span class="line"></span><br><span class="line">ngx_addon_name=ngx_http_fastdfs_module</span><br><span class="line"></span><br><span class="line">if test -n &quot;$&#123;ngx_module_link&#125;&quot;; then</span><br><span class="line">    ngx_module_type=HTTP</span><br><span class="line">    ngx_module_name=$ngx_addon_name</span><br><span class="line">    ngx_module_incs=&quot;/usr/include&quot;</span><br><span class="line">    ngx_module_libs=&quot;-lfastcommon -lfdfsclient&quot;</span><br><span class="line">    ngx_module_srcs=&quot;$ngx_addon_dir/ngx_http_fastdfs_module.c&quot;</span><br><span class="line">    ngx_module_deps=</span><br><span class="line">    CFLAGS=&quot;$CFLAGS -D_FILE_OFFSET_BITS=64 -DFDFS_OUTPUT_CHUNK_SIZE=&apos;256*1024&apos; -DFDFS_MOD_CONF_FILENAME=&apos;\&quot;/etc/fdfs/mod_fastdfs.conf\&quot;&apos;&quot;</span><br><span class="line">    . auto/module</span><br><span class="line">else</span><br><span class="line">    HTTP_MODULES=&quot;$HTTP_MODULES ngx_http_fastdfs_module&quot;</span><br><span class="line">    NGX_ADDON_SRCS=&quot;$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_fastdfs_module.c&quot;</span><br><span class="line">    CORE_INCS=&quot;$CORE_INCS /usr/include&quot;</span><br><span class="line">    CORE_LIBS=&quot;$CORE_LIBS -lfastcommon -lfdfsclient&quot;</span><br><span class="line">    CFLAGS=&quot;$CFLAGS -D_FILE_OFFSET_BITS=64 -DFDFS_OUTPUT_CHUNK_SIZE=&apos;256*1024&apos; -DFDFS_MOD_CONF_FILENAME=&apos;\&quot;/etc/fdfs/mod_fastdfs.conf\&quot;&apos;&quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<h4 id="对nginx重新config"><a href="#对nginx重新config" class="headerlink" title="对nginx重新config"></a>对nginx重新config</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">./configure --add-module=/iflytek/install/fastdfs-nginx-module-master/src</span><br><span class="line">make</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line"># 把module中的mod_fastdfs.conf文件复制到/etc/fdfs目录下。编辑：</span><br><span class="line"># 修改base_path</span><br><span class="line"># 修改tracker_server</span><br><span class="line"># 修改url_have_group_name(改为true)</span><br><span class="line"># 修改store_path0（图片保存路径）</span><br></pre></td></tr></table></figure>
+<h4 id="修改nginx配置文件-重启nginx"><a href="#修改nginx配置文件-重启nginx" class="headerlink" title="修改nginx配置文件 重启nginx"></a>修改nginx配置文件 重启nginx</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line">    location /group1/M00/&#123;</span><br><span class="line">            #root /home/FastDFS/fdfs_storage/data;</span><br><span class="line">            ngx_fastdfs_module;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="将libfdfsclient-so拷贝至-usr-lib下"><a href="#将libfdfsclient-so拷贝至-usr-lib下" class="headerlink" title="将libfdfsclient.so拷贝至/usr/lib下"></a>将libfdfsclient.so拷贝至/usr/lib下</h4><p>cp /usr/lib64/libfdfsclient.so /usr/lib/</p>
+<h4 id="启动nginx"><a href="#启动nginx" class="headerlink" title="启动nginx"></a>启动nginx</h4><p>systemctl start nginx<br>到此处，即可直接从浏览器访问上传的文件（图片）</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/09/fastdfs+nginx编译部署/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2019/07/11/达梦数据库网络管理工具-Dem工具部署/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          达梦数据库网络管理工具-Dem工具部署
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/05/28/git版本控制系统/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">git版本控制系统</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
+  
+
+  
+
+  
+
+  
+
+
+          </div>
+        </div>
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2019 记得
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		mathjax: false,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false,
+		toc_hide_index: true,
+		root: "/",
+		innerArchive: true,
+		showTags: false
+	}
+</script>
+
+
+
+
+    
+<div class="tools-col" q-class="show:isShow,hide:isShow|isFalse" q-on="click:stop(e)">
+  <div class="tools-nav header-menu">
+    
+    
+      
+      
+      
+    
+      
+      
+      
+    
+      
+      
+      
+    
+    
+
+    <ul style="width: 70%">
+    
+    
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'innerArchive')"><a href="javascript:void(0)" q-class="active:innerArchive">所有文章</a></li>
+      
+        
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'friends')"><a href="javascript:void(0)" q-class="active:friends">友链</a></li>
+      
+        
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'aboutme')"><a href="javascript:void(0)" q-class="active:aboutme">关于我</a></li>
+      
+        
+    </ul>
+  </div>
+  <div class="tools-wrap">
+    
+    	<section class="tools-section tools-section-all" q-show="innerArchive">
+        <div class="search-wrap">
+          <input class="search-ipt" q-model="search" type="text" placeholder="find something…">
+          <i class="icon-search icon" q-show="search|isEmptyStr"></i>
+          <i class="icon-close icon" q-show="search|isNotEmptyStr" q-on="click:clearChose(e)"></i>
+        </div>
+        <div class="widget tagcloud search-tag">
+          <p class="search-tag-wording">tag:</p>
+          <label class="search-switch">
+            <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
+          </label>
+          <ul class="article-tag-list" q-show="showTags">
+            
+            <div class="clearfix"></div>
+          </ul>
+        </div>
+        <ul class="search-ul">
+          <p q-show="jsonFail" style="padding: 20px; font-size: 12px;">
+            缺失模块。<br/>1、请确保node版本大于6.2<br/>2、在博客根目录（注意不是yilia根目录）执行以下命令：<br/> npm i hexo-generator-json-content --save<br/><br/>
+            3、在根目录_config.yml里添加配置：
+<pre style="font-size: 12px;" q-show="jsonFail">
+  jsonContent:
+    meta: false
+    pages: false
+    posts:
+      title: true
+      date: true
+      path: true
+      text: false
+      raw: false
+      content: false
+      slug: false
+      updated: false
+      comments: false
+      link: false
+      permalink: false
+      excerpt: false
+      categories: false
+      tags: true
+</pre>
+          </p>
+          <li class="search-li" q-repeat="items" q-show="isShow">
+            <a q-attr="href:path|urlformat" class="search-title"><i class="icon-quo-left icon"></i><span q-text="title"></span></a>
+            <p class="search-time">
+              <i class="icon-calendar icon"></i>
+              <span q-text="date|dateformat"></span>
+            </p>
+            <p class="search-tag">
+              <i class="icon-price-tags icon"></i>
+              <span q-repeat="tags" q-on="click:choseTag(e, name)" q-text="name|tagformat"></span>
+            </p>
+          </li>
+        </ul>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends" q-show="friends">
+  		
+        <ul class="search-ul">
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接1</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接2</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接3</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接4</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接5</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接6</a>
+            </li>
+          
+        </ul>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me" q-show="aboutme">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>

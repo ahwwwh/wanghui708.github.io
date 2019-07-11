@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <link rel="dns-prefetch" href="http://yoursite.com">
+  <title>达梦数据库网络管理工具-Dem工具部署 | 明哲而痴心</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="搭建远程web服务管理达梦数据库——DEM服务搭建1. 功能简介DEM全称为Dameng Enterprise Manager。本工具主要提供如下功能：  客户端工具：用户能够通过DEM工具来进行达梦数据库的对象管理、状态监控、SQL查询与调试。  监控与告警：本功能是达梦DEM工具的核心功能。通过远程主机部署代理，能够实现对远程主机状态和远程主机上达梦数据库实例状态的监控。重要的是，DEM的监控">
+<meta property="og:type" content="article">
+<meta property="og:title" content="达梦数据库网络管理工具-Dem工具部署">
+<meta property="og:url" content="http://yoursite.com/2019/07/11/达梦数据库网络管理工具-Dem工具部署/index.html">
+<meta property="og:site_name" content="明哲而痴心">
+<meta property="og:description" content="搭建远程web服务管理达梦数据库——DEM服务搭建1. 功能简介DEM全称为Dameng Enterprise Manager。本工具主要提供如下功能：  客户端工具：用户能够通过DEM工具来进行达梦数据库的对象管理、状态监控、SQL查询与调试。  监控与告警：本功能是达梦DEM工具的核心功能。通过远程主机部署代理，能够实现对远程主机状态和远程主机上达梦数据库实例状态的监控。重要的是，DEM的监控">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-4.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-1.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-2.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-3.png">
+<meta property="og:updated_time" content="2019-07-11T01:56:27.783Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="达梦数据库网络管理工具-Dem工具部署">
+<meta name="twitter:description" content="搭建远程web服务管理达梦数据库——DEM服务搭建1. 功能简介DEM全称为Dameng Enterprise Manager。本工具主要提供如下功能：  客户端工具：用户能够通过DEM工具来进行达梦数据库的对象管理、状态监控、SQL查询与调试。  监控与告警：本功能是达梦DEM工具的核心功能。通过远程主机部署代理，能够实现对远程主机状态和远程主机上达梦数据库实例状态的监控。重要的是，DEM的监控">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-4.png">
+  
+    <link rel="alternative" href="/atom.xml" title="明哲而痴心" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" type="text/css" href="/./main.0cf68a.css">
+  <style type="text/css">
+  
+    #container.show {
+      background: linear-gradient(200deg,#a0cfe4,#e8c37e);
+    }
+  </style>
+  
+
+  
+
+</head>
+
+<body>
+  <div id="container" q-class="show:isCtnShow">
+    <canvas id="anm-canvas" class="anm-canvas"></canvas>
+    <div class="left-col" q-class="show:isShow">
+      
+<div class="overlay" style="background: #4d4d4d"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="" class="js-avatar">
+		</a>
+		<hgroup>
+		  <h1 class="header-author"><a href="/">记得</a></h1>
+		</hgroup>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/tags/随笔/">随笔</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+    		
+    			
+    			<a q-on="click: openSlider(e, 'innerArchive')" href="javascript:void(0)">所有文章</a>
+    			
+            
+    			
+    			<a q-on="click: openSlider(e, 'friends')" href="javascript:void(0)">友链</a>
+    			
+            
+    			
+    			<a q-on="click: openSlider(e, 'aboutme')" href="javascript:void(0)">关于我</a>
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="#" title="github"><i class="icon-github"></i></a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo"><i class="icon-weibo"></i></a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss"><i class="icon-rss"></i></a>
+		        
+					<a class="zhihu" target="_blank" href="#" title="zhihu"><i class="icon-zhihu"></i></a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col" q-class="show:isShow,hide:isShow|isFalse">
+      
+<nav id="mobile-nav">
+  	<div class="overlay js-overlay" style="background: #4d4d4d"></div>
+	<div class="btnctn js-mobile-btnctn">
+  		<div class="slider-trigger list" q-on="click: openSlider(e)"><i class="icon icon-sort"></i></div>
+	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author js-header-author">记得</h1>
+			</hgroup>
+			
+			
+			
+				
+			
+				
+			
+			
+			
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="#" title="github"><i class="icon-github"></i></a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo"><i class="icon-weibo"></i></a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss"><i class="icon-rss"></i></a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu"><i class="icon-zhihu"></i></a>
+			        
+				</div>
+			</nav>
+
+			<nav class="header-menu js-header-menu">
+				<ul style="width: 50%">
+				
+				
+					<li style="width: 50%"><a href="/">主页</a></li>
+		        
+					<li style="width: 50%"><a href="/tags/随笔/">随笔</a></li>
+		        
+				</ul>
+			</nav>
+		</header>				
+	</div>
+	<div class="mobile-mask" style="display:none" q-show="isShow"></div>
+</nav>
+
+      <div id="wrapper" class="body-wrap">
+        <div class="menu-l">
+          <div class="canvas-wrap">
+            <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
+          </div>
+          <div id="js-content" class="content-ll">
+            <article id="post-达梦数据库网络管理工具-Dem工具部署" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      达梦数据库网络管理工具-Dem工具部署
+    </h1>
+  
+
+        
+        <a href="/2019/07/11/达梦数据库网络管理工具-Dem工具部署/" class="archive-article-date">
+  	<time datetime="2019-07-11T01:36:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="搭建远程web服务管理达梦数据库——DEM服务搭建"><a href="#搭建远程web服务管理达梦数据库——DEM服务搭建" class="headerlink" title="搭建远程web服务管理达梦数据库——DEM服务搭建"></a>搭建远程web服务管理达梦数据库——DEM服务搭建</h1><h2 id="1-功能简介"><a href="#1-功能简介" class="headerlink" title="1. 功能简介"></a>1. 功能简介</h2><p>DEM全称为Dameng Enterprise Manager。本工具主要提供如下功能：</p>
+<ul>
+<li><p>客户端工具：用户能够通过DEM工具来进行达梦数据库的对象管理、状态监控、SQL查询与调试。</p>
+</li>
+<li><p>监控与告警：本功能是达梦DEM工具的核心功能。通过远程主机部署代理，能够实现对远程主机状态和远程主机上达梦数据库实例状态的监控。重要的是，DEM的监控不只局限于单个数据库实例，它能够对数据库集群(MPP、RAC、数据守护)进行监控和管理。</p>
+</li>
+<li><p>系统管理：DEM工具提供了工具本身的系统配置与权限管理，方便不同用户同时使用工具，并限制非admin用户的权限。</p>
+</li>
+</ul>
+<h2 id="2-环境搭建"><a href="#2-环境搭建" class="headerlink" title="2. 环境搭建"></a>2. 环境搭建</h2><h3 id="2-1-搭建与配置后台数据库"><a href="#2-1-搭建与配置后台数据库" class="headerlink" title="2.1 搭建与配置后台数据库"></a>2.1 搭建与配置后台数据库</h3><p>搭建后台数据库。创建一个数据库作为DEM后台数据库, 数据库dm.ini参数配置进行优化, 推荐配置:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MEMORY_POOL = 200</span><br><span class="line">BUFFER = 1000</span><br><span class="line">KEEP = 64</span><br><span class="line">MAX_BUFFER =  2000</span><br><span class="line">SORT_BUF_SIZE = 50</span><br></pre></td></tr></table></figure>
+<p>配置完后重启数据库实例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ISN]# systemctl restart DmServiceISN</span><br><span class="line">[root@localhost ISN]# systemctl status DmServiceISN</span><br><span class="line">● DmServiceISN.service - Dameng Database Service(DmServiceISN).</span><br><span class="line">   Loaded: loaded (/usr/lib/systemd/system/DmServiceISN.service; enabled; vendor preset: disabled)</span><br><span class="line">   Active: active (exited) since 三 2019-07-10 11:09:46 CST; 10s ago</span><br><span class="line">  Process: 47068 ExecStop=/opt/dmdbms/bin/DmServiceISN stop (code=exited, status=0/SUCCESS)</span><br><span class="line">  Process: 47114 ExecStart=/opt/dmdbms/bin/DmServiceISN start (code=exited, status=0/SUCCESS)</span><br><span class="line"> Main PID: 47114 (code=exited, status=0/SUCCESS)</span><br><span class="line"></span><br><span class="line">7月 10 11:09:31 localhost.localdomain systemd[1]: Starting Dameng Database Service(DmServiceISN)....</span><br><span class="line">7月 10 11:09:31 localhost.localdomain su[47132]: (to dmdba) root on none</span><br><span class="line">7月 10 11:09:31 localhost.localdomain su[47132]: pam_limits(su-l:session): invalid line &apos;soft stack 102400&apos; - skipped</span><br><span class="line">7月 10 11:09:31 localhost.localdomain DmServiceISN[47114]: Starting DmServiceISN: 上一次登录：二 7月  9 11:12:38 CST 2019</span><br><span class="line">7月 10 11:09:46 localhost.localdomain DmServiceISN[47114]: [11B blob data]</span><br><span class="line">7月 10 11:09:46 localhost.localdomain systemd[1]: Started Dameng Database Service(DmServiceISN)..</span><br></pre></td></tr></table></figure>
+<h3 id="2-2-创建DEM服务相关数据表"><a href="#2-2-创建DEM服务相关数据表" class="headerlink" title="2.2 创建DEM服务相关数据表"></a>2.2 创建DEM服务相关数据表</h3><p>在数据库中执行以下SQL脚本$DM_HOME/web/dem_init.sql；</p>
+<p>执行sql有三种方式：</p>
+<ul>
+<li>达梦管理工具</li>
+<li>达梦数据迁移工具</li>
+<li>disql</li>
+</ul>
+<p>本文使用达梦管理工具进行执行，登录后新建查询，执行sql脚本</p>
+<p><img src="/images/pasted-4.png" alt="upload successful"></p>
+<p>执行完毕后，将在当前数据库创建模式DEM以及相应的表结构。</p>
+<h3 id="2-3-配置后台数据库的连接信息"><a href="#2-3-配置后台数据库的连接信息" class="headerlink" title="2.3 配置后台数据库的连接信息"></a>2.3 配置后台数据库的连接信息</h3><p>找到达梦数据库安装目录下的web文件夹下的dem.war包，需要编辑配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 服务器中该文件地址为：/opt/dmdbms/web/dem.war</span><br><span class="line"># 以下是命令行操作配置文件，完成war包编辑</span><br><span class="line">unzip dem.war -d dem</span><br><span class="line">cd dem/WEB-INF</span><br><span class="line">vi db.xml</span><br></pre></td></tr></table></figure>
+<p>修改db.xml文件，将ip、端口、用户名和密码等改为实际的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ..</span><br><span class="line">zip -r dem.war ./*</span><br></pre></td></tr></table></figure>
+<p>将重新压缩的war包移至tomcat中进行部署，启动tomcat<br>tomcat配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(1)在conf/server.xml中  &lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;... 追加属性字段  maxPostSize=&quot;-1&quot;；</span><br><span class="line">(2)修改jvm启动参数，</span><br><span class="line">      Linux：bin/catalina.sh -&gt; 	JAVA_OPTS=&quot;-server -Xms256m -Xmx1024m -XX:MaxPermSize=512m -Djava.library.path=/opt/dmdbms/bin&quot;；</span><br><span class="line">      Windows：bin/catalina.bat -&gt; set java_opts= -server -Xms40m -Xmx1024m -XX:MaxPermSize=512m -Djava.library.path=c:\dmdbms\bin；</span><br></pre></td></tr></table></figure>
+<p>访问ip:port/dem（eg: <a href="http://192.168.0.1:8080/dem），默认用户名密码（admin/888888）" target="_blank" rel="noopener">http://192.168.0.1:8080/dem），默认用户名密码（admin/888888）</a></p>
+<p><img src="/images/pasted-1.png" alt="upload successful"></p>
+<p>至此，就可以使用dem工具管理达梦数据库了，下面配置监控。</p>
+<h2 id="3-启用dem监控"><a href="#3-启用dem监控" class="headerlink" title="3. 启用dem监控"></a>3. 启用dem监控</h2><h2 id="3-1-dmagent"><a href="#3-1-dmagent" class="headerlink" title="3.1 dmagent"></a>3.1 dmagent</h2><p>首先，在需要进行监控的主机上启动dmagent，要求agent和dem所运行主机时间一致；</p>
+<p>达梦数据库代理（以下简称dmagent）是DM部署工具和DM Web版管理工具DEM部署在远程主机上的代理。通过dmagent可以监控远程主机的相关信息，也可以在远程主机部署MPP、RW、DW,DMRAC等集群系统。</p>
+<p>dmagent存在3种运行模式：</p>
+<ol>
+<li>DEM Agent </li>
+<li>Deploy Agent </li>
+<li>DEM&amp;Deploy Agent。</li>
+</ol>
+<p>不同模式对应不同的功能。运行模式1:dmagent作为DEM Agent将负责远程主机的信息收集工作。运行模式2:dmagent作为Deploy Agent将负责在远程主机进行数据库节点搭建的工作。运行模式3:dmagent将同时开启运行模式1和运行模式2。</p>
+<p>dmagent目录在安装目录下的tool/dmagent</p>
+<ul>
+<li>data目录:用于存放DEM Agent模式代理产生的临时数据。</li>
+<li>lib目录:存放dmagent运行所需要的jar包。</li>
+<li>log目录：保存dmagent生成的日志文件。</li>
+<li>wrapper目录：dmagent生成系统服务依赖文件。</li>
+<li>log4j.xml：日志配置文件。</li>
+<li>readme.pdf：dmagent使用说明文档。</li>
+<li><p>config.properties：dmagent配置文件。配置信息如下：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#[General]</span><br><span class="line">#1:DEM Agent 2:Deploy Agent 3:DEM&amp;Deploy Agent</span><br><span class="line">#设置dmagent的运行模式 </span><br><span class="line">run_mode=3</span><br><span class="line">#dmagent的RMI端口号 </span><br><span class="line">rmi_port=6364</span><br><span class="line"></span><br><span class="line">#[DEM]</span><br><span class="line">#DEM Agent运行模式所需参数 </span><br><span class="line">#DEM系统所在主机连接信息 </span><br><span class="line">center.url=http://192.168.0.1:8080/dem</span><br><span class="line">center.agent_servlet=dem/dma_agent</span><br></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">修改配置config.properties：</span><br><span class="line">  		center.url=http://192.168.0.1:8080/dem    #DEM访问地址</span><br><span class="line">  		center.agent_servlet=dem/dma_agent        #一般无需调整</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>DMAgentRunner.bat：dmagent命令行模式运行脚本。用户如果以命令行模式运行dmagent，请直接运行DMAgentRunner.bat。</p>
+<p>DMAgentService.bat：dmagent服务模式运行脚本。dmagent默认服务名为DMAgentService。DMAgentService.bat支持功能如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 服务方式启动dmagent  </span><br><span class="line"># Linux平台请运行同名的sh脚本</span><br><span class="line"># windows下需先注册服务，才能启动。 </span><br><span class="line"># linux下虽然可直接启动，但是并非通过服务启动dmagent。如果需要通过服务启动dmagent，请先注册服务。 </span><br><span class="line">DMAgentService.sh start</span><br><span class="line"></span><br><span class="line">#停止dmagent服务 </span><br><span class="line">DMAgentService.sh stop</span><br><span class="line"></span><br><span class="line">#重启dmagent服务 </span><br><span class="line">DMAgentService.sh restart</span><br><span class="line"></span><br><span class="line">#注册dmagent服务 </span><br><span class="line">#默认服务为自动启动 </span><br><span class="line">DMAgentService.sh install</span><br><span class="line"></span><br><span class="line">#删除dmagent服务 </span><br><span class="line">DMAgentService.sh remove</span><br><span class="line"></span><br><span class="line">#查看dmagent服务运行状态 </span><br><span class="line">DMAgentService.sh status</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 执行</span><br><span class="line">DMAgentService.sh install</span><br><span class="line">systemctl start DMAgentService</span><br><span class="line">systemctl status DMAgentService</span><br></pre></td></tr></table></figure>
+<p>在远程主机使用dmagent，需首先手动将dmagent拷贝到远程主机。然后通过DMAgentService(服务方式)或DMAgentRunner(命令行模式)运行dmagent。在Linux下建议以非root用户运行dmagent。</p>
+<p>DMAgent服务启动成功后，即可在DEM中的主机处即可看到被监控的主机信息：</p>
+<p><img src="/images/pasted-2.png" alt="upload successful"></p>
+<p>之后，可以在数据库选项卡中添加对应主机上的数据库实例:</p>
+<p><img src="/images/pasted-3.png" alt="upload successful"></p>
+<p>添加完毕后，即可对该数据库实例进行实时监控，比如常用的AWR报告生成或会话的分析。</p>
+<h2 id="3-2-dem监控配置"><a href="#3-2-dem监控配置" class="headerlink" title="3.2 dem监控配置"></a>3.2 dem监控配置</h2><ol>
+<li>用管理员登陆系统后，可以在”系统管理”-&gt;”系统配置”页面中对系统的其他属性进行配置，包括dmagent的监控频率、前端刷新频率、邮件手机通知告警等；</li>
+<li>若要启用邮件通知，需用管理员用户登录系统， 在系统配置中完成系统邮箱的相关配置；</li>
+<li>若需要启用短信通知，用户需要借助达梦提供的WEB-INF/lib/demsdk.jar，实现 com.dameng.dem.server.util.IPhoneNotify接口，将依赖包及实现类打包放入到WEB-INF/lib下，重启web容器，然后在系统配置中完成短信通知的相关配置即可。</li>
+</ol>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/11/达梦数据库网络管理工具-Dem工具部署/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2019/07/09/fastdfs+nginx编译部署/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Fastdfs+nginx编译部署</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
+  
+
+  
+
+  
+
+  
+
+
+          </div>
+        </div>
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2019 记得
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		mathjax: false,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false,
+		toc_hide_index: true,
+		root: "/",
+		innerArchive: true,
+		showTags: false
+	}
+</script>
+
+
+
+
+    
+<div class="tools-col" q-class="show:isShow,hide:isShow|isFalse" q-on="click:stop(e)">
+  <div class="tools-nav header-menu">
+    
+    
+      
+      
+      
+    
+      
+      
+      
+    
+      
+      
+      
+    
+    
+
+    <ul style="width: 70%">
+    
+    
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'innerArchive')"><a href="javascript:void(0)" q-class="active:innerArchive">所有文章</a></li>
+      
+        
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'friends')"><a href="javascript:void(0)" q-class="active:friends">友链</a></li>
+      
+        
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'aboutme')"><a href="javascript:void(0)" q-class="active:aboutme">关于我</a></li>
+      
+        
+    </ul>
+  </div>
+  <div class="tools-wrap">
+    
+    	<section class="tools-section tools-section-all" q-show="innerArchive">
+        <div class="search-wrap">
+          <input class="search-ipt" q-model="search" type="text" placeholder="find something…">
+          <i class="icon-search icon" q-show="search|isEmptyStr"></i>
+          <i class="icon-close icon" q-show="search|isNotEmptyStr" q-on="click:clearChose(e)"></i>
+        </div>
+        <div class="widget tagcloud search-tag">
+          <p class="search-tag-wording">tag:</p>
+          <label class="search-switch">
+            <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
+          </label>
+          <ul class="article-tag-list" q-show="showTags">
+            
+            <div class="clearfix"></div>
+          </ul>
+        </div>
+        <ul class="search-ul">
+          <p q-show="jsonFail" style="padding: 20px; font-size: 12px;">
+            缺失模块。<br/>1、请确保node版本大于6.2<br/>2、在博客根目录（注意不是yilia根目录）执行以下命令：<br/> npm i hexo-generator-json-content --save<br/><br/>
+            3、在根目录_config.yml里添加配置：
+<pre style="font-size: 12px;" q-show="jsonFail">
+  jsonContent:
+    meta: false
+    pages: false
+    posts:
+      title: true
+      date: true
+      path: true
+      text: false
+      raw: false
+      content: false
+      slug: false
+      updated: false
+      comments: false
+      link: false
+      permalink: false
+      excerpt: false
+      categories: false
+      tags: true
+</pre>
+          </p>
+          <li class="search-li" q-repeat="items" q-show="isShow">
+            <a q-attr="href:path|urlformat" class="search-title"><i class="icon-quo-left icon"></i><span q-text="title"></span></a>
+            <p class="search-time">
+              <i class="icon-calendar icon"></i>
+              <span q-text="date|dateformat"></span>
+            </p>
+            <p class="search-tag">
+              <i class="icon-price-tags icon"></i>
+              <span q-repeat="tags" q-on="click:choseTag(e, name)" q-text="name|tagformat"></span>
+            </p>
+          </li>
+        </ul>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends" q-show="friends">
+  		
+        <ul class="search-ul">
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接1</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接2</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接3</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接4</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接5</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接6</a>
+            </li>
+          
+        </ul>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me" q-show="aboutme">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>
