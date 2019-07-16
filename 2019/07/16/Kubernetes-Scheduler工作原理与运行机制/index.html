@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <link rel="dns-prefetch" href="http://yoursite.com">
+  <title>Kubernetes Scheduler工作原理与运行机制 | 明哲而痴心</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Kubernetes Scheduler工作原理与运行机制Scheduler原理简介负责Pod调度的重要功能模块，将待调度的pod按照特定的调度算法和调度策略绑定到合适的node，并将绑定信息写入etcd。 即：将PodSpec.NodeName为空的Pods逐个地，经过预选(Predicates)和优选(Priorities)两个步骤，挑选最合适的Node作为该Pod的Destination。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes Scheduler工作原理与运行机制">
+<meta property="og:url" content="http://yoursite.com/2019/07/16/Kubernetes-Scheduler工作原理与运行机制/index.html">
+<meta property="og:site_name" content="明哲而痴心">
+<meta property="og:description" content="Kubernetes Scheduler工作原理与运行机制Scheduler原理简介负责Pod调度的重要功能模块，将待调度的pod按照特定的调度算法和调度策略绑定到合适的node，并将绑定信息写入etcd。 即：将PodSpec.NodeName为空的Pods逐个地，经过预选(Predicates)和优选(Priorities)两个步骤，挑选最合适的Node作为该Pod的Destination。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-07-16T07:02:34.135Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes Scheduler工作原理与运行机制">
+<meta name="twitter:description" content="Kubernetes Scheduler工作原理与运行机制Scheduler原理简介负责Pod调度的重要功能模块，将待调度的pod按照特定的调度算法和调度策略绑定到合适的node，并将绑定信息写入etcd。 即：将PodSpec.NodeName为空的Pods逐个地，经过预选(Predicates)和优选(Priorities)两个步骤，挑选最合适的Node作为该Pod的Destination。">
+  
+    <link rel="alternative" href="/atom.xml" title="明哲而痴心" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" type="text/css" href="/./main.0cf68a.css">
+  <style type="text/css">
+  
+    #container.show {
+      background: linear-gradient(200deg,#a0cfe4,#e8c37e);
+    }
+  </style>
+  
+
+  
+
+</head>
+
+<body>
+  <div id="container" q-class="show:isCtnShow">
+    <canvas id="anm-canvas" class="anm-canvas"></canvas>
+    <div class="left-col" q-class="show:isShow">
+      
+<div class="overlay" style="background: #4d4d4d"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="" class="js-avatar">
+		</a>
+		<hgroup>
+		  <h1 class="header-author"><a href="/">记得</a></h1>
+		</hgroup>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/tags/随笔/">随笔</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+    		
+    			
+    			<a q-on="click: openSlider(e, 'innerArchive')" href="javascript:void(0)">所有文章</a>
+    			
+            
+    			
+    			<a q-on="click: openSlider(e, 'friends')" href="javascript:void(0)">友链</a>
+    			
+            
+    			
+    			<a q-on="click: openSlider(e, 'aboutme')" href="javascript:void(0)">关于我</a>
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="#" title="github"><i class="icon-github"></i></a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo"><i class="icon-weibo"></i></a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss"><i class="icon-rss"></i></a>
+		        
+					<a class="zhihu" target="_blank" href="#" title="zhihu"><i class="icon-zhihu"></i></a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col" q-class="show:isShow,hide:isShow|isFalse">
+      
+<nav id="mobile-nav">
+  	<div class="overlay js-overlay" style="background: #4d4d4d"></div>
+	<div class="btnctn js-mobile-btnctn">
+  		<div class="slider-trigger list" q-on="click: openSlider(e)"><i class="icon icon-sort"></i></div>
+	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author js-header-author">记得</h1>
+			</hgroup>
+			
+			
+			
+				
+			
+				
+			
+			
+			
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="#" title="github"><i class="icon-github"></i></a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo"><i class="icon-weibo"></i></a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss"><i class="icon-rss"></i></a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu"><i class="icon-zhihu"></i></a>
+			        
+				</div>
+			</nav>
+
+			<nav class="header-menu js-header-menu">
+				<ul style="width: 50%">
+				
+				
+					<li style="width: 50%"><a href="/">主页</a></li>
+		        
+					<li style="width: 50%"><a href="/tags/随笔/">随笔</a></li>
+		        
+				</ul>
+			</nav>
+		</header>				
+	</div>
+	<div class="mobile-mask" style="display:none" q-show="isShow"></div>
+</nav>
+
+      <div id="wrapper" class="body-wrap">
+        <div class="menu-l">
+          <div class="canvas-wrap">
+            <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
+          </div>
+          <div id="js-content" class="content-ll">
+            <article id="post-Kubernetes-Scheduler工作原理与运行机制" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Kubernetes Scheduler工作原理与运行机制
+    </h1>
+  
+
+        
+        <a href="/2019/07/16/Kubernetes-Scheduler工作原理与运行机制/" class="archive-article-date">
+  	<time datetime="2019-07-16T07:02:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Kubernetes-Scheduler工作原理与运行机制"><a href="#Kubernetes-Scheduler工作原理与运行机制" class="headerlink" title="Kubernetes Scheduler工作原理与运行机制"></a>Kubernetes Scheduler工作原理与运行机制</h1><h2 id="Scheduler原理简介"><a href="#Scheduler原理简介" class="headerlink" title="Scheduler原理简介"></a>Scheduler原理简介</h2><p>负责Pod调度的重要功能模块，将待调度的pod按照特定的调度算法和调度策略绑定到合适的node，并将绑定信息写入etcd。</p>
+<p>即：将PodSpec.NodeName为空的Pods逐个地，经过预选(Predicates)和优选(Priorities)两个步骤，挑选最合适的Node作为该Pod的Destination。</p>
+<p>整个过程涉及三个对象：</p>
+<ul>
+<li>待调度的pod列表</li>
+<li>可用node列表</li>
+<li>调度算法和策略</li>
+</ul>
+<p>两大步骤：</p>
+<ul>
+<li><strong>预选</strong>：根据配置的Predicates Policies（默认为DefaultProvider中定义的default predicates policies集合）过滤掉那些不满足这些Policies的的Nodes，剩下的Nodes就作为优选的输入。</li>
+<li><strong>优选</strong>：根据配置的Priorities Policies（默认为DefaultProvider中定义的default priorities policies集合）给预选后的Nodes进行打分排名，得分最高的Node即作为最适合的Node，该Pod就Bind到这个Node。</li>
+</ul>
+<blockquote>
+<p>如果经过优选将Nodes打分排名后，有多个Nodes并列得分最高，那么scheduler将随机从中选择一个Node作为目标Node。</p>
+</blockquote>
+<p>随后，目标node上的kubelet进程通过api-server监听到pod绑定事件。</p>
+<h2 id="Predicates-Policies"><a href="#Predicates-Policies" class="headerlink" title="Predicates Policies"></a>Predicates Policies</h2><p>Predicates Policies就是提供给Scheduler用来过滤出满足所定义条件的Nodes，并发的(最多16个goroutine)对每个Node启动所有Predicates Policies的遍历Filter，看其是否都满足配置的Predicates Policies，若有一个Policy不满足，则直接被淘汰。</p>
+<blockquote>
+<p>注意：这里的并发goroutine number为All Nodes number，但最多不能超过16个，由一个queue控制。</p>
+</blockquote>
+<p>Kubernetes提供了以下Predicates Policies的定义，你可以在kube-scheduler启动参数中添加<font color="#0099ff"> –policy-config-file </font>来指定要运用的Policies集合,比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">&quot;kind&quot; : &quot;Policy&quot;,</span><br><span class="line">&quot;apiVersion&quot; : &quot;v1&quot;,</span><br><span class="line">&quot;predicates&quot; : [</span><br><span class="line">    &#123;&quot;name&quot; : &quot;PodFitsPorts&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;PodFitsResources&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;NoDiskConflict&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;NoVolumeZoneConflict&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;MatchNodeSelector&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;HostName&quot;&#125;</span><br><span class="line">    ],</span><br><span class="line">&quot;priorities&quot; : [</span><br><span class="line">    ...</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><strong>NoDiskConflict</strong>: Evaluate if a pod can fit due to the volumes it requests, and those that are already mounted. Currently supported volumes are: AWS EBS, GCE PD, ISCSI and Ceph RBD. Only Persistent Volume Claims for those supported types are checked. Persistent Volumes added directly to pods are not evaluated and are not constrained by this policy.</li>
+<li><strong>NoVolumeZoneConflict</strong>: Evaluate if the volumes a pod requests are available on the node, given the Zone restrictions.</li>
+<li><strong>PodFitsResources</strong>: Check if the free resource (CPU and Memory) meets the requirement of the Pod. The free resource is measured by the capacity minus the sum of requests of all Pods on the node. To learn more about the resource QoS in Kubernetes, please check QoS proposal.</li>
+<li><strong>PodFitsHostPorts</strong>: Check if any HostPort required by the Pod is already occupied on the node.</li>
+<li><strong>HostName</strong>: Filter out all nodes except the one specified in the PodSpec’s NodeName field.</li>
+<li><strong>MatchNodeSelector</strong>: Check if the labels of the node match the labels specified in the Pod’s nodeSelector field and, as of Kubernetes v1.2, also match the scheduler.alpha.kubernetes.io/affinity pod annotation if present. See here for more details on both.</li>
+<li><strong>MaxEBSVolumeCount</strong>: Ensure that the number of attached ElasticBlockStore volumes does not exceed a maximum value (by default, 39, since Amazon recommends a maximum of 40 with one of those 40 reserved for the root volume – see Amazon’s documentation). The maximum value can be controlled by setting the KUBE_MAX_PD_VOLS environment variable.</li>
+<li><strong>MaxGCEPDVolumeCount</strong>: Ensure that the number of attached GCE PersistentDisk volumes does not exceed a maximum value (by default, 16, which is the maximum GCE allows – see GCE’s documentation). The maximum value can be controlled by setting the KUBE_MAX_PD_VOLS environment variable.</li>
+<li><strong>CheckNodeMemoryPressure</strong>: Check if a pod can be scheduled on a node reporting memory pressure condition. Currently, no BestEffort should be placed on a node under memory pressure as it gets automatically evicted by kubelet.</li>
+<li><strong>CheckNodeDiskPressure</strong>: Check if a pod can be scheduled on a node reporting disk pressure condition. Currently, no pods should be placed on a node under disk pressure as it gets automatically evicted by kubelet.</li>
+</ol>
+<p>默认的DefaultProvider中选了以下Predicates Policies：</p>
+<ol>
+<li>NoVolumeZoneConflict</li>
+<li>MaxEBSVolumeCount</li>
+<li>MaxGCEPDVolumeCount</li>
+<li><p>MatchInterPodAffinity</p>
+<blockquote>
+<p>说明：Fit is determined by inter-pod affinity.AffinityAnnotationKey represents the key of affinity data (json serialized) in the Annotations of a Pod.</p>
+</blockquote>
+<blockquote>
+<font color="#0099ff"> AffinityAnnotationKey string = “scheduler.alpha.kubernetes.io/affinity” </font></blockquote>
+</li>
+<li>NoDiskConflict</li>
+<li>GeneralPredicates <ol>
+<li>PodFitsResources<ol>
+<li>pod, in number</li>
+<li>cpu, in cores</li>
+<li>memory, in bytes</li>
+<li>alpha.kubernetes.io/nvidia-gpu, in devices。截止V1.4，每个node最多只支持1个gpu  </li>
+</ol>
+</li>
+<li>PodFitsHost</li>
+<li>PodFitsHostPorts</li>
+<li>PodSelectorMatches</li>
+</ol>
+</li>
+<li>PodToleratesNodeTaints</li>
+<li>CheckNodeMemoryPressure</li>
+<li>CheckNodeDiskPressure</li>
+</ol>
+<h2 id="Priorities-Policies"><a href="#Priorities-Policies" class="headerlink" title="Priorities Policies"></a>Priorities Policies</h2><p>经过预选策略甩选后得到的Nodes，会来到优选步骤。在这个过程中，会并发的根据每个Node分别启动一个goroutine，在每个goroutine中会根据对应的policy实现，遍历所有的预选Nodes，分别进行打分，每个Node每一个Policy的打分为0-10分，0分最低，10分最高。待所有policy对应的goroutine都完成后，根据设置的各个priorities policies的权重weight，对每个node的各个policy的得分进行加权求和作为最终的node的得分。</p>
+<blockquote>
+<font color="#0099ff"> finalScoreNodeA = (weight1 <em> priorityFunc1) + (weight2 </em> priorityFunc2) </font>
+
+<p>注意：这里的并发goroutine number为All Nodes number，但最多不能超过16个，由一个queue控制。<br>思考：如果经过预选后，没有一个Node满足条件，则直接返回FailedPredicates报错，不会再触发Prioritizing阶段，这是合理的。但是，如果经过预选后，只有一个Node满足条件，同样会触发Prioritizing，并且所走的流程和多个Nodes一样。实际上，如果只有一个Node满足条件，在优选阶段，可以直接返回该Node作为最终scheduled结果，无需跑完整个打分流程。</p>
+</blockquote>
+<p>如果经过优选将Nodes打分排名后，有多个Nodes并列得分最高，那么scheduler将随机从中选择一个Node作为目标Node。</p>
+<p>Kubernetes提供了以下Priorities Policies的定义，你可以在kube-scheduler启动参数中添加<font color="#0099ff"> –policy-config-file </font>来指定要运用的Policies集合，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">&quot;kind&quot; : &quot;Policy&quot;,</span><br><span class="line">&quot;apiVersion&quot; : &quot;v1&quot;,</span><br><span class="line">&quot;predicates&quot; : [</span><br><span class="line">    ...</span><br><span class="line">    ],</span><br><span class="line">&quot;priorities&quot; : [</span><br><span class="line">    &#123;&quot;name&quot; : &quot;LeastRequestedPriority&quot;, &quot;weight&quot; : 1&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;BalancedResourceAllocation&quot;, &quot;weight&quot; : 1&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;ServiceSpreadingPriority&quot;, &quot;weight&quot; : 1&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;EqualPriority&quot;, &quot;weight&quot; : 1&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><strong>LeastRequestedPriority</strong>: The node is prioritized based on the fraction of the node that would be free if the new Pod were scheduled onto the node. (In other words, (capacity - sum of requests of all Pods already on the node - request of Pod that is being scheduled) / capacity). CPU and memory are equally weighted. The node with the highest free fraction is the most preferred. Note that this priority function has the effect of spreading Pods across the nodes with respect to resource consumption.</li>
+<li><strong>BalancedResourceAllocation</strong>: This priority function tries to put the Pod on a node such that the CPU and Memory utilization rate is balanced after the Pod is deployed.</li>
+<li><strong>SelectorSpreadPriority</strong>: Spread Pods by minimizing the number of Pods belonging to the same service, replication controller, or replica set on the same node. If zone information is present on the nodes, the priority will be adjusted so that pods are spread across zones and nodes.</li>
+<li><strong>CalculateAntiAffinityPriority</strong>: Spread Pods by minimizing the number of Pods belonging to the same service on nodes with the same value for a particular label.</li>
+<li><strong>ImageLocalityPriority</strong>: Nodes are prioritized based on locality of images requested by a pod. Nodes with larger size of already-installed packages required by the pod will be preferred over nodes with no already-installed packages required by the pod or a small total size of already-installed packages required by the pod.</li>
+<li><strong>NodeAffinityPriority</strong>: (Kubernetes v1.2) Implements preferredDuringSchedulingIgnoredDuringExecution node affinity; see here for more details.</li>
+</ol>
+<p>默认的DefaultProvider中选了以下Priorities Policies：</p>
+<ol>
+<li>SelectorSpreadPriority, 默认权重为1；</li>
+<li><p>InterPodAffinityPriority, 默认权重为1；</p>
+<blockquote>
+<ol>
+<li>pods should be placed in the same topological domain (e.g. same node, same rack, same zone, same power domain, etc.)</li>
+<li>as some other pods, or, conversely, should not be placed in the same topological domain as some other pods.</li>
+<li>AffinityAnnotationKey represents the key of affinity data (json serialized) in the Annotations of a Pod.    </li>
+</ol>
+</blockquote>
+<blockquote>
+ <font color="#0099ff"> scheduler.alpha.kubernetes.io/affinity=”…” </font>
+</blockquote>
+</li>
+<li><p>LeastRequestedPriority, 默认权重为1;</p>
+</li>
+<li>BalancedResourceAllocation, 默认权重为1</li>
+<li><p>NodePreferAvoidPodsPriority, 默认权重为10000</p>
+<blockquote>
+<p>说明：这里权重设置足够大（10000），如果得分不为0，那么加权后最终得分将很高，如果得分为0，那么意味着相对其他得搞很高的，注定被淘汰,分析如下：</p>
+</blockquote>
+<blockquote>
+<p>如果Node的Anotation没有设置key-value:<br><font color="#0099FF"> scheduler.alpha.kubernetes.io/preferAvoidPods=”…” </font><br>则该node对该policy的得分就是10分，加上权重10000，那么该node对该policy的得分至少10W分。<br>如果Node的Anotation设置了<font color="#0099FF"> scheduler.alpha.kubernetes.io/preferAvoidPods=”…” </font><br>如果该pod对应的Controller是ReplicationController或ReplicaSet，则该node对该policy的得分就是0分，那么该node对该policy的得分相对没有设置该Anotation的Node得分低的离谱了。也就是说这个<strong>Node一定会被淘汰</strong>！</p>
+</blockquote>
+</li>
+</ol>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/16/Kubernetes-Scheduler工作原理与运行机制/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2019/07/16/Druid学习总结/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Druid学习总结</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
+  
+
+  
+
+  
+
+  
+
+
+          </div>
+        </div>
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2019 记得
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		mathjax: false,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false,
+		toc_hide_index: true,
+		root: "/",
+		innerArchive: true,
+		showTags: false
+	}
+</script>
+
+
+
+
+    
+<div class="tools-col" q-class="show:isShow,hide:isShow|isFalse" q-on="click:stop(e)">
+  <div class="tools-nav header-menu">
+    
+    
+      
+      
+      
+    
+      
+      
+      
+    
+      
+      
+      
+    
+    
+
+    <ul style="width: 70%">
+    
+    
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'innerArchive')"><a href="javascript:void(0)" q-class="active:innerArchive">所有文章</a></li>
+      
+        
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'friends')"><a href="javascript:void(0)" q-class="active:friends">友链</a></li>
+      
+        
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'aboutme')"><a href="javascript:void(0)" q-class="active:aboutme">关于我</a></li>
+      
+        
+    </ul>
+  </div>
+  <div class="tools-wrap">
+    
+    	<section class="tools-section tools-section-all" q-show="innerArchive">
+        <div class="search-wrap">
+          <input class="search-ipt" q-model="search" type="text" placeholder="find something…">
+          <i class="icon-search icon" q-show="search|isEmptyStr"></i>
+          <i class="icon-close icon" q-show="search|isNotEmptyStr" q-on="click:clearChose(e)"></i>
+        </div>
+        <div class="widget tagcloud search-tag">
+          <p class="search-tag-wording">tag:</p>
+          <label class="search-switch">
+            <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
+          </label>
+          <ul class="article-tag-list" q-show="showTags">
+            
+            <div class="clearfix"></div>
+          </ul>
+        </div>
+        <ul class="search-ul">
+          <p q-show="jsonFail" style="padding: 20px; font-size: 12px;">
+            缺失模块。<br/>1、请确保node版本大于6.2<br/>2、在博客根目录（注意不是yilia根目录）执行以下命令：<br/> npm i hexo-generator-json-content --save<br/><br/>
+            3、在根目录_config.yml里添加配置：
+<pre style="font-size: 12px;" q-show="jsonFail">
+  jsonContent:
+    meta: false
+    pages: false
+    posts:
+      title: true
+      date: true
+      path: true
+      text: false
+      raw: false
+      content: false
+      slug: false
+      updated: false
+      comments: false
+      link: false
+      permalink: false
+      excerpt: false
+      categories: false
+      tags: true
+</pre>
+          </p>
+          <li class="search-li" q-repeat="items" q-show="isShow">
+            <a q-attr="href:path|urlformat" class="search-title"><i class="icon-quo-left icon"></i><span q-text="title"></span></a>
+            <p class="search-time">
+              <i class="icon-calendar icon"></i>
+              <span q-text="date|dateformat"></span>
+            </p>
+            <p class="search-tag">
+              <i class="icon-price-tags icon"></i>
+              <span q-repeat="tags" q-on="click:choseTag(e, name)" q-text="name|tagformat"></span>
+            </p>
+          </li>
+        </ul>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends" q-show="friends">
+  		
+        <ul class="search-ul">
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接1</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接2</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接3</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接4</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接5</a>
+            </li>
+          
+            <li class="search-li">
+              <a href="http://localhost:4000/" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>友情链接6</a>
+            </li>
+          
+        </ul>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me" q-show="aboutme">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>

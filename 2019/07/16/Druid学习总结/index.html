@@ -6,18 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>明哲而痴心</title>
+  <title>Druid学习总结 | 明哲而痴心</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="非淡泊无以明志，非宁静无以致远">
-<meta property="og:type" content="website">
-<meta property="og:title" content="明哲而痴心">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="Druid 学习总结1. Druid简介Druid是一个JDBC组件，包括三部分：  DruidDriver：代理Driver，能够提供基于Filter-Chain模式的插件体系。 DruidDataSource：高效可管理的数据库连接池。 SQLParser ：sql解析器   2. Druid功能 监控数据库访问性能，Druid内置提供一个功能强大的StatFilter插件，能够详细统计SQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Druid学习总结">
+<meta property="og:url" content="http://yoursite.com/2019/07/16/Druid学习总结/index.html">
 <meta property="og:site_name" content="明哲而痴心">
-<meta property="og:description" content="非淡泊无以明志，非宁静无以致远">
+<meta property="og:description" content="Druid 学习总结1. Druid简介Druid是一个JDBC组件，包括三部分：  DruidDriver：代理Driver，能够提供基于Filter-Chain模式的插件体系。 DruidDataSource：高效可管理的数据库连接池。 SQLParser ：sql解析器   2. Druid功能 监控数据库访问性能，Druid内置提供一个功能强大的StatFilter插件，能够详细统计SQL">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-07-16T06:28:30.329Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="明哲而痴心">
-<meta name="twitter:description" content="非淡泊无以明志，非宁静无以致远">
+<meta name="twitter:title" content="Druid学习总结">
+<meta name="twitter:description" content="Druid 学习总结1. Druid简介Druid是一个JDBC组件，包括三部分：  DruidDriver：代理Driver，能够提供基于Filter-Chain模式的插件体系。 DruidDataSource：高效可管理的数据库连接池。 SQLParser ：sql解析器   2. Druid功能 监控数据库访问性能，Druid内置提供一个功能强大的StatFilter插件，能够详细统计SQL">
   
     <link rel="alternative" href="/atom.xml" title="明哲而痴心" type="application/atom+xml">
   
@@ -153,187 +154,14 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-Kubernetes-Scheduler工作原理与运行机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-Druid学习总结" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/16/Kubernetes-Scheduler工作原理与运行机制/">Kubernetes Scheduler工作原理与运行机制</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/16/Kubernetes-Scheduler工作原理与运行机制/" class="archive-article-date">
-  	<time datetime="2019-07-16T07:02:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-16</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Kubernetes-Scheduler工作原理与运行机制"><a href="#Kubernetes-Scheduler工作原理与运行机制" class="headerlink" title="Kubernetes Scheduler工作原理与运行机制"></a>Kubernetes Scheduler工作原理与运行机制</h1><h2 id="Scheduler原理简介"><a href="#Scheduler原理简介" class="headerlink" title="Scheduler原理简介"></a>Scheduler原理简介</h2><p>负责Pod调度的重要功能模块，将待调度的pod按照特定的调度算法和调度策略绑定到合适的node，并将绑定信息写入etcd。</p>
-<p>即：将PodSpec.NodeName为空的Pods逐个地，经过预选(Predicates)和优选(Priorities)两个步骤，挑选最合适的Node作为该Pod的Destination。</p>
-<p>整个过程涉及三个对象：</p>
-<ul>
-<li>待调度的pod列表</li>
-<li>可用node列表</li>
-<li>调度算法和策略</li>
-</ul>
-<p>两大步骤：</p>
-<ul>
-<li><strong>预选</strong>：根据配置的Predicates Policies（默认为DefaultProvider中定义的default predicates policies集合）过滤掉那些不满足这些Policies的的Nodes，剩下的Nodes就作为优选的输入。</li>
-<li><strong>优选</strong>：根据配置的Priorities Policies（默认为DefaultProvider中定义的default priorities policies集合）给预选后的Nodes进行打分排名，得分最高的Node即作为最适合的Node，该Pod就Bind到这个Node。</li>
-</ul>
-<blockquote>
-<p>如果经过优选将Nodes打分排名后，有多个Nodes并列得分最高，那么scheduler将随机从中选择一个Node作为目标Node。</p>
-</blockquote>
-<p>随后，目标node上的kubelet进程通过api-server监听到pod绑定事件。</p>
-<h2 id="Predicates-Policies"><a href="#Predicates-Policies" class="headerlink" title="Predicates Policies"></a>Predicates Policies</h2><p>Predicates Policies就是提供给Scheduler用来过滤出满足所定义条件的Nodes，并发的(最多16个goroutine)对每个Node启动所有Predicates Policies的遍历Filter，看其是否都满足配置的Predicates Policies，若有一个Policy不满足，则直接被淘汰。</p>
-<blockquote>
-<p>注意：这里的并发goroutine number为All Nodes number，但最多不能超过16个，由一个queue控制。</p>
-</blockquote>
-<p>Kubernetes提供了以下Predicates Policies的定义，你可以在kube-scheduler启动参数中添加<font color="#0099ff"> –policy-config-file </font>来指定要运用的Policies集合,比如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">&quot;kind&quot; : &quot;Policy&quot;,</span><br><span class="line">&quot;apiVersion&quot; : &quot;v1&quot;,</span><br><span class="line">&quot;predicates&quot; : [</span><br><span class="line">    &#123;&quot;name&quot; : &quot;PodFitsPorts&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;PodFitsResources&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;NoDiskConflict&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;NoVolumeZoneConflict&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;MatchNodeSelector&quot;&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;HostName&quot;&#125;</span><br><span class="line">    ],</span><br><span class="line">&quot;priorities&quot; : [</span><br><span class="line">    ...</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li><strong>NoDiskConflict</strong>: Evaluate if a pod can fit due to the volumes it requests, and those that are already mounted. Currently supported volumes are: AWS EBS, GCE PD, ISCSI and Ceph RBD. Only Persistent Volume Claims for those supported types are checked. Persistent Volumes added directly to pods are not evaluated and are not constrained by this policy.</li>
-<li><strong>NoVolumeZoneConflict</strong>: Evaluate if the volumes a pod requests are available on the node, given the Zone restrictions.</li>
-<li><strong>PodFitsResources</strong>: Check if the free resource (CPU and Memory) meets the requirement of the Pod. The free resource is measured by the capacity minus the sum of requests of all Pods on the node. To learn more about the resource QoS in Kubernetes, please check QoS proposal.</li>
-<li><strong>PodFitsHostPorts</strong>: Check if any HostPort required by the Pod is already occupied on the node.</li>
-<li><strong>HostName</strong>: Filter out all nodes except the one specified in the PodSpec’s NodeName field.</li>
-<li><strong>MatchNodeSelector</strong>: Check if the labels of the node match the labels specified in the Pod’s nodeSelector field and, as of Kubernetes v1.2, also match the scheduler.alpha.kubernetes.io/affinity pod annotation if present. See here for more details on both.</li>
-<li><strong>MaxEBSVolumeCount</strong>: Ensure that the number of attached ElasticBlockStore volumes does not exceed a maximum value (by default, 39, since Amazon recommends a maximum of 40 with one of those 40 reserved for the root volume – see Amazon’s documentation). The maximum value can be controlled by setting the KUBE_MAX_PD_VOLS environment variable.</li>
-<li><strong>MaxGCEPDVolumeCount</strong>: Ensure that the number of attached GCE PersistentDisk volumes does not exceed a maximum value (by default, 16, which is the maximum GCE allows – see GCE’s documentation). The maximum value can be controlled by setting the KUBE_MAX_PD_VOLS environment variable.</li>
-<li><strong>CheckNodeMemoryPressure</strong>: Check if a pod can be scheduled on a node reporting memory pressure condition. Currently, no BestEffort should be placed on a node under memory pressure as it gets automatically evicted by kubelet.</li>
-<li><strong>CheckNodeDiskPressure</strong>: Check if a pod can be scheduled on a node reporting disk pressure condition. Currently, no pods should be placed on a node under disk pressure as it gets automatically evicted by kubelet.</li>
-</ol>
-<p>默认的DefaultProvider中选了以下Predicates Policies：</p>
-<ol>
-<li>NoVolumeZoneConflict</li>
-<li>MaxEBSVolumeCount</li>
-<li>MaxGCEPDVolumeCount</li>
-<li><p>MatchInterPodAffinity</p>
-<blockquote>
-<p>说明：Fit is determined by inter-pod affinity.AffinityAnnotationKey represents the key of affinity data (json serialized) in the Annotations of a Pod.</p>
-</blockquote>
-<blockquote>
-<font color="#0099ff"> AffinityAnnotationKey string = “scheduler.alpha.kubernetes.io/affinity” </font></blockquote>
-</li>
-<li>NoDiskConflict</li>
-<li>GeneralPredicates <ol>
-<li>PodFitsResources<ol>
-<li>pod, in number</li>
-<li>cpu, in cores</li>
-<li>memory, in bytes</li>
-<li>alpha.kubernetes.io/nvidia-gpu, in devices。截止V1.4，每个node最多只支持1个gpu  </li>
-</ol>
-</li>
-<li>PodFitsHost</li>
-<li>PodFitsHostPorts</li>
-<li>PodSelectorMatches</li>
-</ol>
-</li>
-<li>PodToleratesNodeTaints</li>
-<li>CheckNodeMemoryPressure</li>
-<li>CheckNodeDiskPressure</li>
-</ol>
-<h2 id="Priorities-Policies"><a href="#Priorities-Policies" class="headerlink" title="Priorities Policies"></a>Priorities Policies</h2><p>经过预选策略甩选后得到的Nodes，会来到优选步骤。在这个过程中，会并发的根据每个Node分别启动一个goroutine，在每个goroutine中会根据对应的policy实现，遍历所有的预选Nodes，分别进行打分，每个Node每一个Policy的打分为0-10分，0分最低，10分最高。待所有policy对应的goroutine都完成后，根据设置的各个priorities policies的权重weight，对每个node的各个policy的得分进行加权求和作为最终的node的得分。</p>
-<blockquote>
-<font color="#0099ff"> finalScoreNodeA = (weight1 <em> priorityFunc1) + (weight2 </em> priorityFunc2) </font>
-
-<p>注意：这里的并发goroutine number为All Nodes number，但最多不能超过16个，由一个queue控制。<br>思考：如果经过预选后，没有一个Node满足条件，则直接返回FailedPredicates报错，不会再触发Prioritizing阶段，这是合理的。但是，如果经过预选后，只有一个Node满足条件，同样会触发Prioritizing，并且所走的流程和多个Nodes一样。实际上，如果只有一个Node满足条件，在优选阶段，可以直接返回该Node作为最终scheduled结果，无需跑完整个打分流程。</p>
-</blockquote>
-<p>如果经过优选将Nodes打分排名后，有多个Nodes并列得分最高，那么scheduler将随机从中选择一个Node作为目标Node。</p>
-<p>Kubernetes提供了以下Priorities Policies的定义，你可以在kube-scheduler启动参数中添加<font color="#0099ff"> –policy-config-file </font>来指定要运用的Policies集合，比如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">&quot;kind&quot; : &quot;Policy&quot;,</span><br><span class="line">&quot;apiVersion&quot; : &quot;v1&quot;,</span><br><span class="line">&quot;predicates&quot; : [</span><br><span class="line">    ...</span><br><span class="line">    ],</span><br><span class="line">&quot;priorities&quot; : [</span><br><span class="line">    &#123;&quot;name&quot; : &quot;LeastRequestedPriority&quot;, &quot;weight&quot; : 1&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;BalancedResourceAllocation&quot;, &quot;weight&quot; : 1&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;ServiceSpreadingPriority&quot;, &quot;weight&quot; : 1&#125;,</span><br><span class="line">    &#123;&quot;name&quot; : &quot;EqualPriority&quot;, &quot;weight&quot; : 1&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li><strong>LeastRequestedPriority</strong>: The node is prioritized based on the fraction of the node that would be free if the new Pod were scheduled onto the node. (In other words, (capacity - sum of requests of all Pods already on the node - request of Pod that is being scheduled) / capacity). CPU and memory are equally weighted. The node with the highest free fraction is the most preferred. Note that this priority function has the effect of spreading Pods across the nodes with respect to resource consumption.</li>
-<li><strong>BalancedResourceAllocation</strong>: This priority function tries to put the Pod on a node such that the CPU and Memory utilization rate is balanced after the Pod is deployed.</li>
-<li><strong>SelectorSpreadPriority</strong>: Spread Pods by minimizing the number of Pods belonging to the same service, replication controller, or replica set on the same node. If zone information is present on the nodes, the priority will be adjusted so that pods are spread across zones and nodes.</li>
-<li><strong>CalculateAntiAffinityPriority</strong>: Spread Pods by minimizing the number of Pods belonging to the same service on nodes with the same value for a particular label.</li>
-<li><strong>ImageLocalityPriority</strong>: Nodes are prioritized based on locality of images requested by a pod. Nodes with larger size of already-installed packages required by the pod will be preferred over nodes with no already-installed packages required by the pod or a small total size of already-installed packages required by the pod.</li>
-<li><strong>NodeAffinityPriority</strong>: (Kubernetes v1.2) Implements preferredDuringSchedulingIgnoredDuringExecution node affinity; see here for more details.</li>
-</ol>
-<p>默认的DefaultProvider中选了以下Priorities Policies：</p>
-<ol>
-<li>SelectorSpreadPriority, 默认权重为1；</li>
-<li><p>InterPodAffinityPriority, 默认权重为1；</p>
-<blockquote>
-<ol>
-<li>pods should be placed in the same topological domain (e.g. same node, same rack, same zone, same power domain, etc.)</li>
-<li>as some other pods, or, conversely, should not be placed in the same topological domain as some other pods.</li>
-<li>AffinityAnnotationKey represents the key of affinity data (json serialized) in the Annotations of a Pod.    </li>
-</ol>
-</blockquote>
-<blockquote>
- <font color="#0099ff"> scheduler.alpha.kubernetes.io/affinity=”…” </font>
-</blockquote>
-</li>
-<li><p>LeastRequestedPriority, 默认权重为1;</p>
-</li>
-<li>BalancedResourceAllocation, 默认权重为1</li>
-<li><p>NodePreferAvoidPodsPriority, 默认权重为10000</p>
-<blockquote>
-<p>说明：这里权重设置足够大（10000），如果得分不为0，那么加权后最终得分将很高，如果得分为0，那么意味着相对其他得搞很高的，注定被淘汰,分析如下：</p>
-</blockquote>
-<blockquote>
-<p>如果Node的Anotation没有设置key-value:<br><font color="#0099FF"> scheduler.alpha.kubernetes.io/preferAvoidPods=”…” </font><br>则该node对该policy的得分就是10分，加上权重10000，那么该node对该policy的得分至少10W分。<br>如果Node的Anotation设置了<font color="#0099FF"> scheduler.alpha.kubernetes.io/preferAvoidPods=”…” </font><br>如果该pod对应的Controller是ReplicationController或ReplicaSet，则该node对该policy的得分就是0分，那么该node对该policy的得分相对没有设置该Anotation的Node得分低的离谱了。也就是说这个<strong>Node一定会被淘汰</strong>！</p>
-</blockquote>
-</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/16/Kubernetes-Scheduler工作原理与运行机制/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Druid学习总结" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/16/Druid学习总结/">Druid学习总结</a>
+    <h1 class="article-title" itemprop="name">
+      Druid学习总结
     </h1>
   
 
@@ -583,6 +411,27 @@
       
 
       
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
     </div>
     <div class="article-info article-info-index">
       
@@ -590,16 +439,84 @@
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/16/Druid学习总结/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/16/Druid学习总结/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2019/07/16/Kubernetes-Scheduler工作原理与运行机制/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Kubernetes Scheduler工作原理与运行机制
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/07/11/达梦数据库网络管理工具-Dem工具部署/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">达梦数据库网络管理工具-Dem工具部署</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -619,361 +536,14 @@
 
 
 
-
   
-    <article id="post-达梦数据库网络管理工具-Dem工具部署" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/11/达梦数据库网络管理工具-Dem工具部署/">达梦数据库网络管理工具-Dem工具部署</a>
-    </h1>
   
 
-        
-        <a href="/2019/07/11/达梦数据库网络管理工具-Dem工具部署/" class="archive-article-date">
-  	<time datetime="2019-07-11T01:36:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-11</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="搭建远程web服务管理达梦数据库——DEM服务搭建"><a href="#搭建远程web服务管理达梦数据库——DEM服务搭建" class="headerlink" title="搭建远程web服务管理达梦数据库——DEM服务搭建"></a>搭建远程web服务管理达梦数据库——DEM服务搭建</h1><h2 id="1-功能简介"><a href="#1-功能简介" class="headerlink" title="1. 功能简介"></a>1. 功能简介</h2><p>DEM全称为Dameng Enterprise Manager。本工具主要提供如下功能：</p>
-<ul>
-<li><p>客户端工具：用户能够通过DEM工具来进行达梦数据库的对象管理、状态监控、SQL查询与调试。</p>
-</li>
-<li><p>监控与告警：本功能是达梦DEM工具的核心功能。通过远程主机部署代理，能够实现对远程主机状态和远程主机上达梦数据库实例状态的监控。重要的是，DEM的监控不只局限于单个数据库实例，它能够对数据库集群(MPP、RAC、数据守护)进行监控和管理。</p>
-</li>
-<li><p>系统管理：DEM工具提供了工具本身的系统配置与权限管理，方便不同用户同时使用工具，并限制非admin用户的权限。</p>
-</li>
-</ul>
-<h2 id="2-环境搭建"><a href="#2-环境搭建" class="headerlink" title="2. 环境搭建"></a>2. 环境搭建</h2><h3 id="2-1-搭建与配置后台数据库"><a href="#2-1-搭建与配置后台数据库" class="headerlink" title="2.1 搭建与配置后台数据库"></a>2.1 搭建与配置后台数据库</h3><p>搭建后台数据库。创建一个数据库作为DEM后台数据库, 数据库dm.ini参数配置进行优化, 推荐配置:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MEMORY_POOL = 200</span><br><span class="line">BUFFER = 1000</span><br><span class="line">KEEP = 64</span><br><span class="line">MAX_BUFFER =  2000</span><br><span class="line">SORT_BUF_SIZE = 50</span><br></pre></td></tr></table></figure>
-<p>配置完后重启数据库实例。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ISN]# systemctl restart DmServiceISN</span><br><span class="line">[root@localhost ISN]# systemctl status DmServiceISN</span><br><span class="line">● DmServiceISN.service - Dameng Database Service(DmServiceISN).</span><br><span class="line">   Loaded: loaded (/usr/lib/systemd/system/DmServiceISN.service; enabled; vendor preset: disabled)</span><br><span class="line">   Active: active (exited) since 三 2019-07-10 11:09:46 CST; 10s ago</span><br><span class="line">  Process: 47068 ExecStop=/opt/dmdbms/bin/DmServiceISN stop (code=exited, status=0/SUCCESS)</span><br><span class="line">  Process: 47114 ExecStart=/opt/dmdbms/bin/DmServiceISN start (code=exited, status=0/SUCCESS)</span><br><span class="line"> Main PID: 47114 (code=exited, status=0/SUCCESS)</span><br><span class="line"></span><br><span class="line">7月 10 11:09:31 localhost.localdomain systemd[1]: Starting Dameng Database Service(DmServiceISN)....</span><br><span class="line">7月 10 11:09:31 localhost.localdomain su[47132]: (to dmdba) root on none</span><br><span class="line">7月 10 11:09:31 localhost.localdomain su[47132]: pam_limits(su-l:session): invalid line &apos;soft stack 102400&apos; - skipped</span><br><span class="line">7月 10 11:09:31 localhost.localdomain DmServiceISN[47114]: Starting DmServiceISN: 上一次登录：二 7月  9 11:12:38 CST 2019</span><br><span class="line">7月 10 11:09:46 localhost.localdomain DmServiceISN[47114]: [11B blob data]</span><br><span class="line">7月 10 11:09:46 localhost.localdomain systemd[1]: Started Dameng Database Service(DmServiceISN)..</span><br></pre></td></tr></table></figure>
-<h3 id="2-2-创建DEM服务相关数据表"><a href="#2-2-创建DEM服务相关数据表" class="headerlink" title="2.2 创建DEM服务相关数据表"></a>2.2 创建DEM服务相关数据表</h3><p>在数据库中执行以下SQL脚本$DM_HOME/web/dem_init.sql；</p>
-<p>执行sql有三种方式：</p>
-<ul>
-<li>达梦管理工具</li>
-<li>达梦数据迁移工具</li>
-<li>disql</li>
-</ul>
-<p>本文使用达梦管理工具进行执行，登录后新建查询，执行sql脚本</p>
-<p><img src="/images/pasted-4.png" alt="upload successful"></p>
-<p>执行完毕后，将在当前数据库创建模式DEM以及相应的表结构。</p>
-<h3 id="2-3-配置后台数据库的连接信息"><a href="#2-3-配置后台数据库的连接信息" class="headerlink" title="2.3 配置后台数据库的连接信息"></a>2.3 配置后台数据库的连接信息</h3><p>找到达梦数据库安装目录下的web文件夹下的dem.war包，需要编辑配置文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 服务器中该文件地址为：/opt/dmdbms/web/dem.war</span><br><span class="line"># 以下是命令行操作配置文件，完成war包编辑</span><br><span class="line">unzip dem.war -d dem</span><br><span class="line">cd dem/WEB-INF</span><br><span class="line">vi db.xml</span><br></pre></td></tr></table></figure>
-<p>修改db.xml文件，将ip、端口、用户名和密码等改为实际的值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ..</span><br><span class="line">zip -r dem.war ./*</span><br></pre></td></tr></table></figure>
-<p>将重新压缩的war包移至tomcat中进行部署，启动tomcat<br>tomcat配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(1)在conf/server.xml中  &lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;... 追加属性字段  maxPostSize=&quot;-1&quot;；</span><br><span class="line">(2)修改jvm启动参数，</span><br><span class="line">      Linux：bin/catalina.sh -&gt; 	JAVA_OPTS=&quot;-server -Xms256m -Xmx1024m -XX:MaxPermSize=512m -Djava.library.path=/opt/dmdbms/bin&quot;；</span><br><span class="line">      Windows：bin/catalina.bat -&gt; set java_opts= -server -Xms40m -Xmx1024m -XX:MaxPermSize=512m -Djava.library.path=c:\dmdbms\bin；</span><br></pre></td></tr></table></figure>
-<p>访问ip:port/dem（eg: <a href="http://192.168.0.1:8080/dem），默认用户名密码（admin/888888）" target="_blank" rel="noopener">http://192.168.0.1:8080/dem），默认用户名密码（admin/888888）</a></p>
-<p><img src="/images/pasted-1.png" alt="upload successful"></p>
-<p>至此，就可以使用dem工具管理达梦数据库了，下面配置监控。</p>
-<h2 id="3-启用dem监控"><a href="#3-启用dem监控" class="headerlink" title="3. 启用dem监控"></a>3. 启用dem监控</h2><h2 id="3-1-dmagent"><a href="#3-1-dmagent" class="headerlink" title="3.1 dmagent"></a>3.1 dmagent</h2><p>首先，在需要进行监控的主机上启动dmagent，要求agent和dem所运行主机时间一致；</p>
-<p>达梦数据库代理（以下简称dmagent）是DM部署工具和DM Web版管理工具DEM部署在远程主机上的代理。通过dmagent可以监控远程主机的相关信息，也可以在远程主机部署MPP、RW、DW,DMRAC等集群系统。</p>
-<p>dmagent存在3种运行模式：</p>
-<ol>
-<li>DEM Agent </li>
-<li>Deploy Agent </li>
-<li>DEM&amp;Deploy Agent。</li>
-</ol>
-<p>不同模式对应不同的功能。运行模式1:dmagent作为DEM Agent将负责远程主机的信息收集工作。运行模式2:dmagent作为Deploy Agent将负责在远程主机进行数据库节点搭建的工作。运行模式3:dmagent将同时开启运行模式1和运行模式2。</p>
-<p>dmagent目录在安装目录下的tool/dmagent</p>
-<ul>
-<li>data目录:用于存放DEM Agent模式代理产生的临时数据。</li>
-<li>lib目录:存放dmagent运行所需要的jar包。</li>
-<li>log目录：保存dmagent生成的日志文件。</li>
-<li>wrapper目录：dmagent生成系统服务依赖文件。</li>
-<li>log4j.xml：日志配置文件。</li>
-<li>readme.pdf：dmagent使用说明文档。</li>
-<li><p>config.properties：dmagent配置文件。配置信息如下：</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#[General]</span><br><span class="line">#1:DEM Agent 2:Deploy Agent 3:DEM&amp;Deploy Agent</span><br><span class="line">#设置dmagent的运行模式 </span><br><span class="line">run_mode=3</span><br><span class="line">#dmagent的RMI端口号 </span><br><span class="line">rmi_port=6364</span><br><span class="line"></span><br><span class="line">#[DEM]</span><br><span class="line">#DEM Agent运行模式所需参数 </span><br><span class="line">#DEM系统所在主机连接信息 </span><br><span class="line">center.url=http://192.168.0.1:8080/dem</span><br><span class="line">center.agent_servlet=dem/dma_agent</span><br></pre></td></tr></table></figure>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">修改配置config.properties：</span><br><span class="line">  		center.url=http://192.168.0.1:8080/dem    #DEM访问地址</span><br><span class="line">  		center.agent_servlet=dem/dma_agent        #一般无需调整</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>DMAgentRunner.bat：dmagent命令行模式运行脚本。用户如果以命令行模式运行dmagent，请直接运行DMAgentRunner.bat。</p>
-<p>DMAgentService.bat：dmagent服务模式运行脚本。dmagent默认服务名为DMAgentService。DMAgentService.bat支持功能如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 服务方式启动dmagent  </span><br><span class="line"># Linux平台请运行同名的sh脚本</span><br><span class="line"># windows下需先注册服务，才能启动。 </span><br><span class="line"># linux下虽然可直接启动，但是并非通过服务启动dmagent。如果需要通过服务启动dmagent，请先注册服务。 </span><br><span class="line">DMAgentService.sh start</span><br><span class="line"></span><br><span class="line">#停止dmagent服务 </span><br><span class="line">DMAgentService.sh stop</span><br><span class="line"></span><br><span class="line">#重启dmagent服务 </span><br><span class="line">DMAgentService.sh restart</span><br><span class="line"></span><br><span class="line">#注册dmagent服务 </span><br><span class="line">#默认服务为自动启动 </span><br><span class="line">DMAgentService.sh install</span><br><span class="line"></span><br><span class="line">#删除dmagent服务 </span><br><span class="line">DMAgentService.sh remove</span><br><span class="line"></span><br><span class="line">#查看dmagent服务运行状态 </span><br><span class="line">DMAgentService.sh status</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 执行</span><br><span class="line">DMAgentService.sh install</span><br><span class="line">systemctl start DMAgentService</span><br><span class="line">systemctl status DMAgentService</span><br></pre></td></tr></table></figure>
-<p>在远程主机使用dmagent，需首先手动将dmagent拷贝到远程主机。然后通过DMAgentService(服务方式)或DMAgentRunner(命令行模式)运行dmagent。在Linux下建议以非root用户运行dmagent。</p>
-<p>DMAgent服务启动成功后，即可在DEM中的主机处即可看到被监控的主机信息：</p>
-<p><img src="/images/pasted-2.png" alt="upload successful"></p>
-<p>之后，可以在数据库选项卡中添加对应主机上的数据库实例:</p>
-<p><img src="/images/pasted-3.png" alt="upload successful"></p>
-<p>添加完毕后，即可对该数据库实例进行实时监控，比如常用的AWR报告生成或会话的分析。</p>
-<h2 id="3-2-dem监控配置"><a href="#3-2-dem监控配置" class="headerlink" title="3.2 dem监控配置"></a>3.2 dem监控配置</h2><ol>
-<li>用管理员登陆系统后，可以在”系统管理”-&gt;”系统配置”页面中对系统的其他属性进行配置，包括dmagent的监控频率、前端刷新频率、邮件手机通知告警等；</li>
-<li>若要启用邮件通知，需用管理员用户登录系统， 在系统配置中完成系统邮箱的相关配置；</li>
-<li>若需要启用短信通知，用户需要借助达梦提供的WEB-INF/lib/demsdk.jar，实现 com.dameng.dem.server.util.IPhoneNotify接口，将依赖包及实现类打包放入到WEB-INF/lib下，重启web容器，然后在系统配置中完成短信通知的相关配置即可。</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/11/达梦数据库网络管理工具-Dem工具部署/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-fastdfs+nginx编译部署" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/09/fastdfs+nginx编译部署/">Fastdfs+nginx编译部署</a>
-    </h1>
   
 
-        
-        <a href="/2019/07/09/fastdfs+nginx编译部署/" class="archive-article-date">
-  	<time datetime="2019-07-09T08:12:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-09</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h2><ul>
-<li>华为泰山2280服务器</li>
-<li>中标麒麟操作系统</li>
-</ul>
-<h2 id="安装包下载"><a href="#安装包下载" class="headerlink" title="安装包下载"></a>安装包下载</h2><ul>
-<li><a href="http://libevent.org/" target="_blank" rel="noopener">libevent-2.1.8-stable.tar.gz</a></li>
-<li><a href="https://github.com/happyfish100/libfastcommon" target="_blank" rel="noopener">libfastcommonV1.0.39</a></li>
-<li><a href="https://github.com/happyfish100/fastdfs" target="_blank" rel="noopener">fastdfs5.08</a></li>
-<li><a href="https://github.com/happyfish100/fastdfs-nginx-module/releases" target="_blank" rel="noopener">fastdfs-nginx-module_1.20.tar.gz</a></li>
-</ul>
-<h2 id="安装步骤："><a href="#安装步骤：" class="headerlink" title="安装步骤："></a>安装步骤：</h2><h3 id="1-libevent-2-1-8-stable-tar-gz"><a href="#1-libevent-2-1-8-stable-tar-gz" class="headerlink" title="1. libevent-2.1.8-stable.tar.gz"></a>1. libevent-2.1.8-stable.tar.gz</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf  libevent-2.1.8-stable.tar.gz</span><br><span class="line">cd libevent-2.1.8-stable</span><br><span class="line">./configure --prefix=/usr  </span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
-<h3 id="2-libfastcommonV1-0-39"><a href="#2-libfastcommonV1-0-39" class="headerlink" title="2. libfastcommonV1.0.39"></a>2. libfastcommonV1.0.39</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf libfastcommonV1.0.39.tar.gz</span><br><span class="line">cd libfastcommonV1.0.39</span><br><span class="line">./make.sh</span><br><span class="line">./make.sh install</span><br><span class="line">cp /usr/lib64/libfastcommon.so /usr/lib</span><br></pre></td></tr></table></figure>
-<h3 id="3-fastdfs5-12-–-tracker服务"><a href="#3-fastdfs5-12-–-tracker服务" class="headerlink" title="3. fastdfs5.12 – tracker服务"></a>3. fastdfs5.12 – tracker服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 安装Tracker服务</span><br><span class="line">unzip fastdfs-master.zip</span><br><span class="line">cd fastdfs-master</span><br><span class="line">./make.sh</span><br><span class="line">./make.sh install</span><br><span class="line"></span><br><span class="line">#查看安装结果:</span><br><span class="line">ll /usr/bin/fdfs_*  </span><br><span class="line"></span><br><span class="line">#把conf目录下的所有的配置文件都复制到/etc/fdfs下</span><br><span class="line">cp conf/* /etc/fdfs</span><br><span class="line">     </span><br><span class="line">#配置tracker服务</span><br><span class="line">cd /etc/fdfs</span><br><span class="line">vi tracker.conf</span><br><span class="line"></span><br><span class="line">#修改</span><br><span class="line">base_path=/usr/local/fastdfs/tracker</span><br><span class="line">#创建/usr/local/fastdfs/tracker路径</span><br><span class="line">mkidr -p /usr/local/fastdfs/tracker</span><br><span class="line"></span><br><span class="line">#重启使用命令</span><br><span class="line">/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf restart</span><br></pre></td></tr></table></figure>
-<h3 id="4-fastdfs5-08-–-storage服务"><a href="#4-fastdfs5-08-–-storage服务" class="headerlink" title="4. fastdfs5.08 – storage服务"></a>4. fastdfs5.08 – storage服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#设置日志保存路径</span><br><span class="line">base_path=/usr/local/fastdfs/storage</span><br><span class="line">#设置图标文件的保存位置</span><br><span class="line">store_path0=/usr/local/fastdfs/storage</span><br><span class="line">#设置tracker服务</span><br><span class="line">tracker_server=&#123;IP&#125;:22122</span><br><span class="line">#创建该路径</span><br><span class="line">mkdir /usr/local/fastdfs/storage</span><br><span class="line">#启动服务</span><br><span class="line">/usr/bin/fdfs_storaged /etc/fdfs/storage.conf restart</span><br></pre></td></tr></table></figure>
-<h3 id="5-测试"><a href="#5-测试" class="headerlink" title="5. 测试"></a>5. 测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">cd /etc/fdfs</span><br><span class="line">vi client.conf</span><br><span class="line">#设置日志路径</span><br><span class="line">base_path=/usr/local/fastdfs/client</span><br><span class="line">#设置链接服务</span><br><span class="line">tracker_server=&#123;IP&#125;:22122</span><br><span class="line">#创建路径</span><br><span class="line">mkdir /usr/local/fastdfs/client</span><br><span class="line">#开始测试</span><br><span class="line">cd /etc/fdfs</span><br><span class="line">#上传当前anti-steal.jpg图片</span><br><span class="line">/usr/bin/fdfs_test /etc/fdfs/client.conf upload anti-steal.jpg</span><br><span class="line">#结果如下则成功:</span><br><span class="line">  file crc32=2553063749example file url: http://&#123;IP&#125;/group1/M00/00/00/rBIHSVp4F2eAVzatAABdrZgsqUU155.jpg</span><br><span class="line">remote_filename=M00/00/00/rBIHSVp4F2eAVzatAABdrZgsqUU155_big.jpg</span><br><span class="line">example file url: http://&#123;IP&#125;/group1/M00/00/00/rBIHSVp4F2eAVzatAABdrZgsqUU155_big.jpg</span><br></pre></td></tr></table></figure>
-<h3 id="6-安装fastdfs-nginx-module-1-20-tar-gz"><a href="#6-安装fastdfs-nginx-module-1-20-tar-gz" class="headerlink" title="6. 安装fastdfs-nginx-module_1.20.tar.gz"></a>6. 安装fastdfs-nginx-module_1.20.tar.gz</h3><h4 id="首先需要安装nginx-nginx-1-15-1"><a href="#首先需要安装nginx-nginx-1-15-1" class="headerlink" title="首先需要安装nginx  nginx 1.15.1"></a>首先需要安装nginx  <a href="http://nginx.org/download/nginx-1.15.1.tar.gz" target="_blank" rel="noopener">nginx 1.15.1</a></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#下载nginx 1.15.1</span><br><span class="line">tar -zxvf nginx-1.15.1.tar.gz</span><br><span class="line">cd nginx-1.15.1</span><br><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
-<h4 id="添加nginx为系统服务"><a href="#添加nginx为系统服务" class="headerlink" title="添加nginx为系统服务"></a>添加nginx为系统服务</h4><p>cat /usr/lib/systemd/system/nginx.service</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=nginx</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=forking</span><br><span class="line">PIDFile=/usr/local/nginx/logs/nginx.pid</span><br><span class="line">ExecStartPre=/usr/local/nginx/sbin/nginx -t -q -g &apos;daemon on; master_process on;&apos;</span><br><span class="line">ExecStart=/usr/local/nginx/sbin/nginx -g &apos;daemon on; master_process on;&apos;</span><br><span class="line">ExecReload=/usr/local/nginx/sbin/nginx -g &apos;daemon on; master_process on;&apos; -s reload</span><br><span class="line">ExecStop=-/sbin/start-stop-daemon --quiet --stop --retry QUIT/5 --pidfile /usr/local/nginx/logs/nginx.pid</span><br><span class="line">TimeoutStopSec=5</span><br><span class="line">KillMode=mixed</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
-<h4 id="修改fastdfs-nginx-module配置文件"><a href="#修改fastdfs-nginx-module配置文件" class="headerlink" title="修改fastdfs-nginx-module配置文件"></a>修改fastdfs-nginx-module配置文件</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">cd fastdfs-nginx-module_1.20</span><br><span class="line">cd src</span><br><span class="line">vi config</span><br><span class="line"></span><br><span class="line"># 注意删除local,很多头文件在/usr/include目录下，而不是/usr/local/include</span><br><span class="line"># config文件内容如下 </span><br><span class="line"></span><br><span class="line">ngx_addon_name=ngx_http_fastdfs_module</span><br><span class="line"></span><br><span class="line">if test -n &quot;$&#123;ngx_module_link&#125;&quot;; then</span><br><span class="line">    ngx_module_type=HTTP</span><br><span class="line">    ngx_module_name=$ngx_addon_name</span><br><span class="line">    ngx_module_incs=&quot;/usr/include&quot;</span><br><span class="line">    ngx_module_libs=&quot;-lfastcommon -lfdfsclient&quot;</span><br><span class="line">    ngx_module_srcs=&quot;$ngx_addon_dir/ngx_http_fastdfs_module.c&quot;</span><br><span class="line">    ngx_module_deps=</span><br><span class="line">    CFLAGS=&quot;$CFLAGS -D_FILE_OFFSET_BITS=64 -DFDFS_OUTPUT_CHUNK_SIZE=&apos;256*1024&apos; -DFDFS_MOD_CONF_FILENAME=&apos;\&quot;/etc/fdfs/mod_fastdfs.conf\&quot;&apos;&quot;</span><br><span class="line">    . auto/module</span><br><span class="line">else</span><br><span class="line">    HTTP_MODULES=&quot;$HTTP_MODULES ngx_http_fastdfs_module&quot;</span><br><span class="line">    NGX_ADDON_SRCS=&quot;$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_fastdfs_module.c&quot;</span><br><span class="line">    CORE_INCS=&quot;$CORE_INCS /usr/include&quot;</span><br><span class="line">    CORE_LIBS=&quot;$CORE_LIBS -lfastcommon -lfdfsclient&quot;</span><br><span class="line">    CFLAGS=&quot;$CFLAGS -D_FILE_OFFSET_BITS=64 -DFDFS_OUTPUT_CHUNK_SIZE=&apos;256*1024&apos; -DFDFS_MOD_CONF_FILENAME=&apos;\&quot;/etc/fdfs/mod_fastdfs.conf\&quot;&apos;&quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-<h4 id="对nginx重新config"><a href="#对nginx重新config" class="headerlink" title="对nginx重新config"></a>对nginx重新config</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">./configure --add-module=/iflytek/install/fastdfs-nginx-module-master/src</span><br><span class="line">make</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line"># 把module中的mod_fastdfs.conf文件复制到/etc/fdfs目录下。编辑：</span><br><span class="line"># 修改base_path</span><br><span class="line"># 修改tracker_server</span><br><span class="line"># 修改url_have_group_name(改为true)</span><br><span class="line"># 修改store_path0（图片保存路径）</span><br></pre></td></tr></table></figure>
-<h4 id="修改nginx配置文件-重启nginx"><a href="#修改nginx配置文件-重启nginx" class="headerlink" title="修改nginx配置文件 重启nginx"></a>修改nginx配置文件 重启nginx</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line">    location /group1/M00/&#123;</span><br><span class="line">            #root /home/FastDFS/fdfs_storage/data;</span><br><span class="line">            ngx_fastdfs_module;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="将libfdfsclient-so拷贝至-usr-lib下"><a href="#将libfdfsclient-so拷贝至-usr-lib下" class="headerlink" title="将libfdfsclient.so拷贝至/usr/lib下"></a>将libfdfsclient.so拷贝至/usr/lib下</h4><p>cp /usr/lib64/libfdfsclient.so /usr/lib/</p>
-<h4 id="启动nginx"><a href="#启动nginx" class="headerlink" title="启动nginx"></a>启动nginx</h4><p>systemctl start nginx<br>到此处，即可直接从浏览器访问上传的文件（图片）</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/09/fastdfs+nginx编译部署/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-git版本控制系统" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/28/git版本控制系统/">git版本控制系统</a>
-    </h1>
   
 
-        
-        <a href="/2019/05/28/git版本控制系统/" class="archive-article-date">
-  	<time datetime="2019-05-28T11:01:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-05-28</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/05/28/git版本控制系统/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Java-多线程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/27/Java-多线程/">Java-多线程</a>
-    </h1>
-  
-
-        
-        <a href="/2019/05/27/Java-多线程/" class="archive-article-date">
-  	<time datetime="2019-05-27T03:19:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-05-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Java多线程编程"><a href="#Java多线程编程" class="headerlink" title="Java多线程编程"></a>Java多线程编程</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
-<li>进程：每个进程有自己独立的代码段和数据空间（进程上下文），进程间切换会有较大的开销，每个进程会有1-n个线程，进程是资源分配的最小单位；</li>
-<li>线程： 同一类线程共享代码段和数据空间，每个线程有独立的运行栈和程序计数器，线程切换开销小（线程是CPU调度的最小单位）</li>
-<li>线程和进程均可分为五阶段：创建、就绪、运行、阻塞、终止</li>
-<li>多进程：操作系统可以同时运行多进程（多个任务）</li>
-<li>多线程：同一个程序可以同时有多个顺序流执行</li>
-</ul>
-<p>Java中实现多线程的三种方式：</p>
-<ul>
-<li>继承Thread类；</li>
-<li>实现Runable接口；</li>
-<li>实现Callable接口，并与Future、线程池结合使用</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/05/27/Java-多线程/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
 
 
@@ -996,8 +566,8 @@
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
