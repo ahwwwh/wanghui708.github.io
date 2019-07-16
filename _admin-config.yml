@@ -1,0 +1,5 @@
+# hexo-admin authentification
+admin:
+  username: wanghui
+  password_hash: $2a$10$U7mUs0o8HZRuboeWO0qbkuvaW4u5WOWp7.e5.tNBeGua/DOEijWT2
+  secret: wanghui
